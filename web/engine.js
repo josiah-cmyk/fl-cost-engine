@@ -180,15 +180,18 @@ export class Engine {
     return events;
   }
 
-  simulateFamily(planId, memberRows, plan) {
+  simulateFamily(planId, memberRows, plan, extraEvents) {
     const rules = this.rules[planId] || {};
     const dedP = plan.ded_person ?? 0, dedF = plan.ded_family ?? dedP * 2;
-    const moopP = plan.moop_person ?? 9200, moopF = plan.moop_family ?? moopP * 2;
+    const moopP = plan.moop_person ?? 9200;
+    const moopF = plan.moop_family ?? moopP * memberRows.length;
     let famDed = 0, famOop = 0, total = 0;
 
-    for (const row of memberRows) {
+    for (let mi = 0; mi < memberRows.length; mi++) {
+      const row = memberRows[mi];
       let ded = 0, oop = 0;
-      for (const [ruleKey, price, count, nights] of this.personEvents(row)) {
+      const events = this.personEvents(row).concat(extraEvents ? extraEvents[mi] || [] : []);
+      for (const [ruleKey, price, count, nights] of events) {
         if (ruleKey === "preventive") continue;
         let r = rules[ruleKey];
         // [copay, coins, afterDed, noCharge, unitCode, covered]
@@ -252,6 +255,10 @@ export class Engine {
     }
 
     const samples = hh.members.map((m) => {
+      if (m.custom) {
+        const row = this.pool.cols.map((c) => m.custom[c] ?? 0);
+        return Array.from({ length: nSims }, () => row);
+      }
       const pool = this.matchPool(m), draw = this.sampler(pool, rng);
       return Array.from({ length: nSims }, draw);
     });
@@ -261,11 +268,13 @@ export class Engine {
       const prem = this.householdPremium(pick.base_plan_id, hh.members);
       if (prem == null) continue;
       const netPremYr = Math.max(0, prem - aptc) * 12;
+      const extras = hh.members.map((m) => (m.drugs || []).map((d) => [
+        d.tier || "rx_brand_preferred", d.fill, d.perYear ?? 12, 1]));
       const oops = [];
       for (let i = 0; i < nSims; i++)
-        oops.push(this.simulateFamily(pick.plan_id, samples.map((s) => s[i]), pick));
+        oops.push(this.simulateFamily(pick.plan_id, samples.map((s) => s[i]), pick, extras));
       oops.sort((a, b) => a - b);
-      const moopF = pick.moop_family ?? 18400;
+      const moopF = pick.moop_family ?? (pick.moop_person != null ? pick.moop_person * hh.members.length : 18400);
       results.push({
         plan_id: pick.plan_id, issuer: pick.issuer, plan: pick.plan_name,
         metal: pick.metal, type: pick.plan_type, variant: pick.variant,

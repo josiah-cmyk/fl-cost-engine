@@ -204,7 +204,7 @@ class Engine:
         ded_p = plan.ded_person if pd.notna(plan.ded_person) else 0.0
         ded_f = plan.ded_family if pd.notna(plan.ded_family) else ded_p * 2
         moop_p = plan.moop_person if pd.notna(plan.moop_person) else 9200.0
-        moop_f = plan.moop_family if pd.notna(plan.moop_family) else moop_p * 2
+        moop_f = plan.moop_family if pd.notna(plan.moop_family) else moop_p * len(member_rows)
         fam_ded_used = fam_oop = 0.0
         total_oop = 0.0
 
@@ -289,7 +289,7 @@ class Engine:
                 self.simulate_family(pick.plan_id,
                                      [samples[j].iloc[i] for j in range(len(hh.members))], pick)
                 for i in range(n_sims)])
-            moop_f = pick.moop_family if pd.notna(pick.moop_family) else 18400
+            moop_f = pick.moop_family if pd.notna(pick.moop_family) else (pick.moop_person * len(hh.members) if pd.notna(pick.moop_person) else 18400)
             results.append({
                 "plan_id": pick.plan_id, "issuer": pick.issuer, "plan": pick.plan_name,
                 "metal": pick.metal, "type": pick.plan_type, "variant": pick.variant,
