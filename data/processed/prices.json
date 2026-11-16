@@ -1,0 +1,134 @@
+{
+ "primary_care_visit": {
+  "medicare_2027": 107.08,
+  "multiplier": 0.96,
+  "allowed": 102.8,
+  "note": "60/40 blend of 99213 and 99214, non-facility, Rest of Florida"
+ },
+ "specialist_visit": {
+  "medicare_2027": 140.4,
+  "multiplier": 0.96,
+  "allowed": 134.78,
+  "note": "75% established 99214, 25% new patient 99204"
+ },
+ "urgent_care_visit": {
+  "medicare_2027": 156.63,
+  "multiplier": 0.96,
+  "allowed": 150.36,
+  "note": "99214 plus 20% for facility overhead (S9083-style global fees vary)"
+ },
+ "mental_health_visit": {
+  "medicare_2027": 179.2,
+  "multiplier": 0.96,
+  "allowed": 172.03,
+  "note": "90837, 60-minute psychotherapy"
+ },
+ "therapy_visit": {
+  "medicare_2027": 86.36,
+  "multiplier": 0.96,
+  "allowed": 82.91,
+  "note": "3 units of 97110"
+ },
+ "other_practitioner_visit": {
+  "medicare_2027": 91.46,
+  "multiplier": 0.96,
+  "allowed": 87.8,
+  "note": "99213"
+ },
+ "prenatal_postnatal_bundle": {
+  "medicare_2027": 2255.15,
+  "multiplier": 1.13,
+  "allowed": 2548.32,
+  "note": "59400 global obstetric care (all prenatal visits, delivery professional fee, postpartum)"
+ },
+ "lab_panel": {
+  "medicare_2027": 18.33,
+  "multiplier": 1.13,
+  "allowed": 20.71,
+  "note": "CMP + CBC at the national lab fee schedule (flat, no geography)"
+ },
+ "xray": {
+  "medicare_2027": 31.78,
+  "multiplier": 1.13,
+  "allowed": 35.91,
+  "note": "71046 chest x-ray 2 views, global, freestanding"
+ },
+ "advanced_imaging_freestanding": {
+  "medicare_2027": 299.85,
+  "multiplier": 1.13,
+  "allowed": 338.84,
+  "note": "MRI brain and CT abd/pelvis, global, freestanding center"
+ },
+ "er_visit": {
+  "medicare_2027": 558.73,
+  "multiplier": null,
+  "allowed": 1270.83,
+  "note": "Facility (OPPS 25/50/25 blend of levels 3-5, wage-adjusted) x 2.35 + ER physician (PFS facility) x 2.00"
+ },
+ "advanced_imaging_hospital": {
+  "medicare_2027": 455.92,
+  "multiplier": null,
+  "allowed": 1038.8,
+  "note": "OPPS imaging APC x 2.35 + radiologist read x 2.00"
+ },
+ "outpatient_surgery_hospital": {
+  "medicare_2027": 2713.27,
+  "multiplier": null,
+  "allowed": 6257.4,
+  "note": "Colonoscopy/knee arthroscopy blend: OPPS x 2.35 + surgeon x 2.00"
+ },
+ "outpatient_surgery_asc": {
+  "medicare_2027": 1395.39,
+  "multiplier": null,
+  "allowed": 1904.16,
+  "note": "Same procedures in a surgery center: ASC rate x 1.44 + independent surgeon x 1.13"
+ },
+ "hospital_outpatient_visit": {
+  "medicare_2027": 217.55,
+  "multiplier": null,
+  "allowed": 482.18,
+  "note": "G0463 clinic facility fee x 2.35 + professional x 2.00"
+ },
+ "inpatient_medical_stay": {
+  "medicare_2027": 7195.76,
+  "multiplier": null,
+  "allowed": 15703.77,
+  "note": "common medical DRGs (pneumonia, heart failure, GI, cellulitis, viral, COPD, sepsis), avg weight; IPPS FY27 amounts, Tampa wage index 0.8682"
+ },
+ "inpatient_surgical_stay": {
+  "medicare_2027": 11281.02,
+  "multiplier": null,
+  "allowed": 24650.49,
+  "note": "joint replacement and gyn surgery DRGs, avg weight; IPPS FY27 amounts, Tampa wage index 0.8682"
+ },
+ "vaginal_delivery_stay": {
+  "medicare_2027": 5963.4,
+  "multiplier": null,
+  "allowed": 13059.85,
+  "note": "DRG 807 mother + DRG 795 normal newborn; IPPS FY27 amounts, Tampa wage index 0.8682"
+ },
+ "cesarean_delivery_stay": {
+  "medicare_2027": 7534.68,
+  "multiplier": null,
+  "allowed": 16500.94,
+  "note": "DRG 788 mother + DRG 795 normal newborn; IPPS FY27 amounts, Tampa wage index 0.8682"
+ },
+ "rx_generic_fill": {
+  "medicare_2027": null,
+  "multiplier": null,
+  "allowed": 22.0,
+  "note": "Decided average per 30-day fill, before rebates; NADAC lookup overrides"
+ },
+ "rx_brand_fill": {
+  "medicare_2027": null,
+  "multiplier": null,
+  "allowed": 385.0,
+  "note": "Decided average per 30-day fill, before rebates; NADAC lookup overrides"
+ },
+ "rx_specialty_fill": {
+  "medicare_2027": null,
+  "multiplier": null,
+  "allowed": 3420.0,
+  "note": "Decided average per 30-day fill, before rebates; NADAC lookup overrides"
+ }
+}
