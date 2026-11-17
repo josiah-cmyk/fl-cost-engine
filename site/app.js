@@ -6,6 +6,141 @@ import { Engine } from "./assets/engine.js";
 const $ = (sel, el = document) => el.querySelector(sel);
 const app = $("#app"), navEl = $("#nav"), progEl = $("#progress"), modeChip = $("#mode-chip");
 
+/* ---------------- Axel the axolotl + motion setup ---------------- */
+const G = typeof gsap !== "undefined" ? gsap : null;
+const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (!G) document.documentElement.classList.add("no-gsap");
+
+let axN = 0;
+/* Inner markup of the axolotl, so he can live in plain HTML or inside a scene SVG. */
+function axBody() {
+  const id = "axg" + (++axN);
+  const skin = 'fill="rgba(165,233,255,0.9)" stroke="rgba(46,125,156,0.7)" stroke-width="3" stroke-linejoin="round"';
+  const gill = 'fill="#64C9EC" stroke="rgba(46,125,156,0.65)" stroke-width="2.5" stroke-linejoin="round"';
+  return `
+  <defs><filter id="${id}" x="-40%" y="-40%" width="180%" height="180%">
+    <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#7FDFFF" flood-opacity="0.7"/>
+  </filter></defs>
+  <g class="ax-all" filter="url(#${id})">
+    <g class="ax-tail"><path d="M146 134 C182 144 204 122 208 90 C194 106 180 106 172 98 C178 118 164 138 142 126 Z" ${skin}/></g>
+    <ellipse cx="108" cy="130" rx="46" ry="36" ${skin}/>
+    <ellipse cx="106" cy="140" rx="25" ry="16" fill="rgba(236,251,255,0.85)"/>
+    <g class="ax-arm-l"><path d="M80 140 q-13 13 -5 26 q10 5 15 -5 q3 -12 -10 -21 Z" ${skin}/></g>
+    <path d="M138 140 q13 13 5 26 q-10 5 -15 -5 q-3 -12 10 -21 Z" ${skin}/>
+    <g class="ax-head">
+      <g class="ax-gill l1"><path d="M64 50 Q42 32 38 14 Q62 24 74 44 Z" ${gill}/><circle cx="50" cy="30" r="2.6" fill="#CFF2FF"/></g>
+      <g class="ax-gill l2"><path d="M56 70 Q30 62 18 48 Q46 50 62 62 Z" ${gill}/><circle cx="34" cy="56" r="2.6" fill="#CFF2FF"/></g>
+      <g class="ax-gill l3"><path d="M58 88 Q34 94 24 110 Q50 104 64 92 Z" ${gill}/><circle cx="38" cy="100" r="2.6" fill="#CFF2FF"/></g>
+      <g class="ax-gill r1"><path d="M148 50 Q170 32 174 14 Q150 24 138 44 Z" ${gill}/><circle cx="162" cy="30" r="2.6" fill="#CFF2FF"/></g>
+      <g class="ax-gill r2"><path d="M156 70 Q182 62 194 48 Q166 50 150 62 Z" ${gill}/><circle cx="178" cy="56" r="2.6" fill="#CFF2FF"/></g>
+      <g class="ax-gill r3"><path d="M154 88 Q178 94 188 110 Q162 104 148 92 Z" ${gill}/><circle cx="174" cy="100" r="2.6" fill="#CFF2FF"/></g>
+      <ellipse cx="106" cy="76" rx="50" ry="44" fill="rgba(165,233,255,0.94)" stroke="rgba(46,125,156,0.7)" stroke-width="3"/>
+      <circle cx="70" cy="96" r="6" fill="rgba(255,126,103,0.4)"/><circle cx="142" cy="96" r="6" fill="rgba(255,126,103,0.4)"/>
+      <circle cx="86" cy="78" r="13" fill="#fff" stroke="rgba(46,125,156,0.4)" stroke-width="1.5"/>
+      <circle cx="126" cy="78" r="13" fill="#fff" stroke="rgba(46,125,156,0.4)" stroke-width="1.5"/>
+      <circle cx="87" cy="79" r="6.5" fill="#1E3A34"/><circle cx="127" cy="79" r="6.5" fill="#1E3A34"/>
+      <circle cx="84" cy="75" r="2.6" fill="#fff"/><circle cx="124" cy="75" r="2.6" fill="#fff"/>
+      <circle cx="90" cy="82" r="1.3" fill="#fff" opacity="0.85"/><circle cx="130" cy="82" r="1.3" fill="#fff" opacity="0.85"/>
+      <g class="ax-lids"><circle cx="86" cy="78" r="13.5" fill="#A5E9FF"/><circle cx="126" cy="78" r="13.5" fill="#A5E9FF"/></g>
+      <g transform="rotate(-5 106 80)" fill="none" stroke="#E8604A" stroke-width="5" stroke-linecap="round">
+        <circle cx="86" cy="79" r="19" fill="rgba(255,255,255,0.13)"/>
+        <circle cx="126" cy="79" r="19" fill="rgba(255,255,255,0.13)"/>
+        <path d="M100 73 Q106 66 112 73"/>
+        <path d="M67 75 L57 69"/><path d="M145 75 L155 69"/>
+      </g>
+      <path d="M96 102 Q106 112 116 102" stroke="#1E3A34" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    </g>
+  </g>`;
+}
+const axolotl = (cls = "", w = 120) =>
+  `<svg class="ax ${cls}" width="${w}" viewBox="0 0 220 190" fill="none" aria-hidden="true">${axBody()}</svg>`;
+
+/* He peeks into the corner of a question screen. */
+const guide = (pose = "ax-tilt", side = "right") =>
+  side === "peek"
+    ? `<div class="ax-guide peek" id="ax-here" aria-hidden="true"><div class="peek-box">
+         <div class="peek-clip"><div class="peek-ax">${axolotl(pose, 108)}</div></div>
+         <svg class="peek-water" viewBox="0 0 140 30"><path d="M4 12 Q22 6 40 12 T76 12 T112 12 T136 12 Q140 27 70 29 Q0 27 4 12Z" fill="#5BC9E2"/><path d="M16 15 Q30 11 44 15 M70 16 Q84 12 98 16" stroke="#DFF6FA" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+       </div></div>`
+    : `<div class="ax-guide ${side === "left" ? "left" : ""}" id="ax-here" aria-hidden="true">${axolotl(pose, 108)}</div>`;
+
+/* When he leaves a screen going forward, Axel hops and dives out of sight with a splash.
+   He does it in a fixed overlay so the next screen can render right away. */
+function diveOut() {
+  const src = $("#ax-here .ax");
+  if (!src || !G || RM) return;
+  const r = src.getBoundingClientRect();
+  if (r.width === 0 || r.bottom < 0) return;
+  const layer = document.createElement("div");
+  layer.setAttribute("aria-hidden", "true");
+  layer.style.cssText = `position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;z-index:30;pointer-events:none`;
+  const fish = src.cloneNode(true);
+  fish.style.cssText = "position:absolute;inset:0;width:100%";
+  const splash = document.createElement("div");
+  splash.className = "splash";
+  splash.innerHTML = `<svg viewBox="0 0 120 50" width="${r.width * 1.1}"><ellipse class="ring" cx="60" cy="38" rx="44" ry="9" stroke="#35C4DC" stroke-width="3" fill="none"/>
+    <circle class="drop" cx="40" cy="30" r="4" fill="#7ED7EA"/><circle class="drop" cx="60" cy="24" r="5" fill="#A5E9FF"/><circle class="drop" cx="82" cy="30" r="4" fill="#7ED7EA"/></svg>`;
+  layer.append(fish, splash);
+  document.body.append(layer);
+  const tl = G.timeline({ onComplete: () => layer.remove() });
+  tl.to(fish, { y: -22, rotation: -10, duration: 0.2, ease: "power2.out" })
+    .to(fish, { y: r.height * 0.9, rotation: 28, scale: 0.75, autoAlpha: 0, duration: 0.34, ease: "power2.in" })
+    .fromTo(splash.querySelector(".ring"), { scale: 0.2, transformOrigin: "50% 50%", autoAlpha: 1 },
+      { scale: 1.3, autoAlpha: 0, duration: 0.5, ease: "power2.out" }, "-=0.1")
+    .fromTo(splash.querySelectorAll(".drop"), { y: 0, autoAlpha: 1 },
+      { y: (i) => [-18, -26, -18][i], x: (i) => [-10, 0, 10][i], autoAlpha: 0, duration: 0.45, ease: "power2.out" }, "<");
+}
+
+const bubbles = (n = 5) => `<span class="bubbles" aria-hidden="true">${Array.from({ length: n }, (_, i) => {
+  const s = 6 + ((i * 7) % 12);
+  return `<span style="left:${8 + (i * 83) % 86}%;width:${s}px;height:${s}px;animation-delay:${(i * 1.3) % 5}s;animation-duration:${5.5 + (i % 3)}s"></span>`;
+}).join("")}</span>`;
+
+const check = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const icoPin = `<svg class="ico-bob" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 18s6-5.2 6-9.6A6 6 0 0 0 4 8.4C4 12.8 10 18 10 18Z" fill="#FF7E67" stroke="#E8604A" stroke-width="1.6"/><circle cx="10" cy="8.4" r="2.3" fill="#fff"/></svg>`;
+const icoHeart = `<svg class="ico-bob" width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 17S2.5 12.2 2.5 7.3A3.9 3.9 0 0 1 10 5.6a3.9 3.9 0 0 1 7.5 1.7C17.5 12.2 10 17 10 17Z" fill="#FF7E67" stroke="#E8604A" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+const icoLeaf = `<svg class="ico-bob" width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M16.5 3.5C9 4 4.5 8.5 4 16c7.5-.5 12-5 12.5-12.5Z" fill="#43A96C" stroke="#2E7D53" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.5 13.5C9 11 12 8 14.5 5.5" stroke="#2E7D53" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+const icoSun = `<svg class="ico-bob" width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="4" fill="#FFD166" stroke="#E8A935" stroke-width="1.5"/><path d="M10 1.5v2.2M10 16.3v2.2M1.5 10h2.2M16.3 10h2.2M4 4l1.6 1.6M14.4 14.4 16 16M16 4l-1.6 1.6M5.6 14.4 4 16" stroke="#E8A935" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+
+const icoCoin = `<svg class="ico-bob" width="26" height="26" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="#FFD166" stroke="#E8A935" stroke-width="1.6"/><circle cx="10" cy="10" r="4.6" stroke="#E8A935" stroke-width="1.2" opacity="0.7"/><path d="M7.5 6.5 9 5" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+const icoShell = `<svg class="ico-bob" width="26" height="26" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3C5.5 3 2.5 7 3 12l2.4 4h9.2L17 12c.5-5-2.5-9-7-9Z" fill="#FFB4A3" stroke="#E8604A" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 4v12M6.3 5.5 7.8 16M13.7 5.5 12.2 16" stroke="#E8604A" stroke-width="1.2" stroke-linecap="round"/></svg>`;
+const icoSparkle = `<svg class="ico-twinkle" width="26" height="26" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.5c.6 3.6 1.9 4.9 5.5 5.5-3.6.6-4.9 1.9-5.5 5.5-.6-3.6-1.9-4.9-5.5-5.5 3.6-.6 4.9-1.9 5.5-5.5Z" fill="#7ED7EA" stroke="#1793AC" stroke-width="1.3" stroke-linejoin="round"/><circle cx="15.5" cy="15" r="1.6" fill="#FFD166"/></svg>`;
+
+/* One choreographed entrance per screen: content rises, Axel swims in. */
+function animateIn() {
+  if (!G || RM) return;
+  const root = app.firstElementChild;
+  if (!root) return;
+  const dir = state.dir >= 0 ? 1 : -1;
+  const kids = [...root.children].filter((el) => el.id !== "ax-here");
+  G.fromTo(kids, { opacity: 0, x: 26 * dir },
+    { opacity: 1, x: 0, duration: 0.45, ease: "power3.out",
+      stagger: (i) => Math.min(i, 5) * 0.06, clearProps: "transform" });
+  const ax = $("#ax-here");
+  if (!ax) return;
+  // After a dive he resurfaces a beat later on the new screen.
+  const wait = dir > 0 ? 0.32 : 0.12;
+  if (ax.classList.contains("peek")) {
+    // Peeks up out of the water, then the tilt loop takes over.
+    G.fromTo(ax.querySelector(".peek-ax"), { y: 70 }, { y: 0, duration: 0.8, ease: "back.out(1.6)", delay: wait + 0.1, clearProps: "transform" });
+  } else {
+    G.fromTo(ax, { opacity: 0, x: 70 * dir, y: 14, rotation: 8 * dir },
+      { opacity: 1, x: 0, y: 0, rotation: 0, duration: 0.7, ease: "back.out(1.4)", delay: wait, clearProps: "transform,opacity" });
+  }
+}
+
+/* Results arrival: he pops up out of his pond with a splash. Plays once per run. */
+function pondArrive() {
+  if (!G || RM || state.pondShown) return;
+  state.pondShown = true;
+  const ax = $(".pond-ax"), ring = $(".pond-ring");
+  if (!ax) return;
+  const tl = G.timeline({ delay: 0.25 });
+  tl.fromTo(ax, { y: 90 }, { y: 0, duration: 0.9, ease: "back.out(1.7)" })
+    .fromTo(ring, { scale: 0.3, autoAlpha: 1, transformOrigin: "50% 50%" }, { scale: 1.4, autoAlpha: 0, duration: 0.7, ease: "power2.out" }, "<0.15")
+    .fromTo(".pond h2, .pond .pond-note", { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out", stagger: 0.08 }, "<0.2");
+}
+
 const state = {
   mode: "quick",            // quick | detailed
   screen: "welcome",
@@ -80,8 +215,13 @@ const CHEERS = ["Let's begin", "Nice start", "Halfway there", "Almost there", "L
 function go(screen, dir = 1) {
   state.dir = dir;
   state.screen = screen;
-  render();
-  window.scrollTo({ top: 0, behavior: "instant" });
+  const done = () => { render(); window.scrollTo({ top: 0, behavior: "instant" }); };
+  const root = app.firstElementChild;
+  if (G && !RM && root) {
+    G.killTweensOf("#app, #app *");
+    if (dir > 0) diveOut();
+    G.to(root,{ opacity: 0, x: -22 * dir, duration: 0.16, ease: "power2.in", onComplete: done });
+  } else done();
 }
 const next = () => { const f = flow(), i = stepIndex(); if (i < f.length - 1) go(f[i + 1], 1); };
 const back = () => { const f = flow(), i = stepIndex(); if (i > 0) go(f[i - 1], -1); };
@@ -107,7 +247,7 @@ function renderChrome() {
         <div class="gl-track">
           <div class="gl-clip" id="gl-clip"><span class="gl-glow"></span>
             <div class="gl-fill"><span class="gl-shim"></span></div></div>
-          <span class="gl-orbwrap" id="gl-orb"><span class="gl-orb"></span></span>
+          <span class="gl-orbwrap" id="gl-orb"><span class="gl-rider">${axolotl("", 42)}</span></span>
         </div></div></div>`;
     requestAnimationFrame(() => requestAnimationFrame(() => {
       $("#gl-clip").style.clipPath = `inset(-14px ${100 - pct}% -14px -14px round 999px)`;
@@ -117,7 +257,7 @@ function renderChrome() {
 }
 
 function nav(buttons) {
-  navEl.innerHTML = `<div class="sticky-nav wrap">${buttons}</div>`;
+  navEl.innerHTML = buttons ? `<div class="sticky-nav wrap">${buttons}</div>` : "";
   const b = $("#btn-back"); if (b) b.onclick = back;
   const f = $("#btn-next"); if (f) f.onclick = () => f.disabled || advance();
 }
@@ -141,21 +281,19 @@ const screens = {};
 screens.welcome = () => {
   app.innerHTML = `
   <div class="narrow stack ${enter()}">
-    <div style="position:relative;height:150px;display:flex;align-items:center;justify-content:center">
-      <span class="breathe" style="position:absolute;width:150px;height:150px;border-radius:999px;background:var(--mint)"></span>
-      <div class="float card" style="position:relative;width:250px;padding:14px 16px;box-shadow:0 10px 24px rgba(22,33,31,0.08)">
-        <span style="font-size:12px;color:var(--muted)">Example plan, typical year</span>
-        <span style="font-size:26px;font-weight:700;display:block">$9,800</span>
-        <span aria-hidden="true" style="display:flex;height:8px;border-radius:4px;overflow:hidden"><span style="width:77%;background:var(--teal)"></span><span style="width:23%;background:#7FC3B7"></span></span>
-        <span style="font-size:12px;color:#2E3A38">Premium after tax credit, plus your care</span>
-      </div>
+    <div id="hero" style="position:relative;height:210px;display:flex;align-items:center;justify-content:center">
+      <span class="breathe" style="position:absolute;width:190px;height:190px;border-radius:999px;background:var(--lagoon-soft)"></span>
+      ${bubbles(6)}
+      <div id="ax-hero" style="position:relative">${axolotl("ax-wave", 190)}</div>
+      <div id="ax-bubble" class="ax-say flip" style="position:absolute;left:calc(50% + 52px);right:6px;top:8px">
+        Hi, I'm Axel! I'll walk you through it.</div>
     </div>
-    <h1 class="q-title">Find the 2027 plan that really costs you the least</h1>
-    <p class="q-sub">The cheapest premium isn't always the cheapest plan. We add what your care would likely cost on each plan, then rank every plan sold in your county.</p>
-    <ul class="pill-row" style="list-style:none;margin:0;padding:0">
-      <li class="assure">Free</li><li class="assure">Nothing you type is saved</li><li class="assure">No ads from insurers</li>
+    <h1 class="q-title" style="text-align:center">Find the 2027 plan that really costs you the least</h1>
+    <p class="q-sub" style="text-align:center;max-width:620px;margin:0 auto">The cheapest premium isn't always the cheapest plan. We add what your care would likely cost on each plan, then rank every plan sold in your county.</p>
+    <ul class="pill-row" style="list-style:none;margin:0;padding:0;justify-content:center">
+      <li class="assure">${icoSun} Free</li><li class="assure">${lock} Nothing you type is saved</li><li class="assure">${icoLeaf} No ads from insurers</li>
     </ul>
-    <div class="stack" style="gap:12px">
+    <div class="stack" style="gap:12px;max-width:480px;width:100%;margin:0 auto">
       <button class="btn big" id="start-quick">Start quick estimate ${arrow}</button>
       <button class="btn ghost" id="start-detailed">Detailed estimate · adds conditions, visits and your prescriptions</button>
     </div>
@@ -164,14 +302,20 @@ screens.welcome = () => {
   $("#start-quick").onclick = () => { state.mode = "quick"; go("zip"); };
   $("#start-detailed").onclick = () => { state.mode = "detailed"; go("zip"); };
   nav("");
+  if (G && !RM) {
+    G.from("#ax-hero", { y: 60, opacity: 0, scale: 0.85, duration: 0.8, ease: "back.out(1.5)", clearProps: "transform,opacity" });
+    G.from("#ax-bubble", { opacity: 0, scale: 0.6, duration: 0.45, ease: "back.out(2)",
+      delay: 0.6, transformOrigin: "0% 90%", clearProps: "transform,opacity" });
+  }
 };
 
 screens.zip = () => {
   const c = data.zipCounty[state.zip];
   app.innerHTML = `
   <div class="narrow stack ${enter()}">
+    ${guide("ax-tilt")}
     <span class="assure">${lock} Only used to find your county</span>
-    <h1 class="q-title">Where do you live?</h1>
+    <h1 class="q-title">Where do you live? ${icoPin}</h1>
     <p class="q-sub">Plans and prices are set county by county.</p>
     <div class="field" style="max-width:280px"><label for="zip">ZIP code</label>
       <input id="zip" class="input-big" style="letter-spacing:0.08em" type="text" inputmode="numeric"
@@ -188,18 +332,20 @@ screens.zip = () => {
     $("#zip-status").innerHTML = cc ? zipOk(cc)
       : (state.zip.length === 5 ? `<span class="warn-chip">That ZIP doesn't look like a Florida ZIP code</span>` : "");
     $("#btn-next").disabled = !cc;
+    const g = $("#ax-here .ax"); if (g) g.classList.toggle("ax-happy", !!cc);
   };
   nav(`${backBtn}<button class="btn big" id="btn-next" ${c ? "" : "disabled"}>Continue ${arrow}</button>`);
 };
 const lock = `<svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.8"/></svg>`;
 const zipOk = (c) => `<span class="assure reveal" role="status" style="font-size:16px;padding:8px 14px">
-  ✓ ${c[2]}, Florida${c[3] ? " · crosses county lines, we use the main county" : ""}</span>`;
+  ${check} ${c[2]}, Florida${c[3] ? " · crosses county lines, we use the main county" : ""}</span>`;
 
 screens.household = () => {
   app.innerHTML = `
   <div class="narrow stack ${enter()}">
-    <span class="assure">Takes about 20 seconds</span>
-    <h1 class="q-title">Who needs coverage in 2027?</h1>
+    ${guide("ax-wave", "left")}
+    <span class="assure" style="align-self:flex-end">Takes about 20 seconds</span>
+    <h1 class="q-title">Who needs coverage in 2027? ${icoShell}</h1>
     <p class="q-sub">Everyone on your tax return who will be on the plan.</p>
     <div id="members" class="stack" style="gap:12px"></div>
     <button class="btn ghost" id="add" style="border-style:dashed">+ Add a person</button>
@@ -233,8 +379,9 @@ screens.household = () => {
 screens.income = () => {
   app.innerHTML = `
   <div class="narrow stack ${enter()}">
+    ${guide("ax-tilt", "peek")}
     <span class="assure">${lock} Never saved or shared</span>
-    <h1 class="q-title">What do you expect your household to earn in 2027?</h1>
+    <h1 class="q-title" style="padding-right:96px">What do you expect your household to earn in 2027? ${icoCoin}</h1>
     <p class="q-sub">Your best guess is fine. Last year's tax return is a good start.</p>
     <div class="field" style="max-width:320px"><label for="inc">Household income before taxes</label>
       <div style="display:flex;align-items:center;gap:6px;border:2px solid var(--teal);border-radius:12px;background:var(--card);padding:0 16px">
@@ -267,6 +414,7 @@ screens.income = () => {
         <div style="font-size:36px;font-weight:700;letter-spacing:-0.02em;color:var(--teal)">
           $${Math.round(aptc).toLocaleString()}<span style="font-size:16px;color:var(--muted);font-weight:500"> a month</span></div>
         <p style="margin:6px 0 0;font-size:15px;color:#2E3A38">${aptc > 0 ? `That's about $${Math.round(aptc * 12).toLocaleString()} off your premiums for the year. ` : ""}${csrNote}</p></div>`;
+    const g = $("#ax-here .ax"); if (g) g.classList.toggle("ax-happy", aptc > 0);
   };
   inp.oninput = () => { inp.value = inp.value.replace(/[^0-9]/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ","); show(); };
   show();
@@ -291,7 +439,8 @@ screens.health = () => {
   ];
   app.innerHTML = `
   <div class="narrow stack ${enter()}">
-    <span class="assure">No right or wrong answer</span>
+    ${guide("ax-tilt")}
+    <span class="assure">${icoHeart} No right or wrong answer</span>
     <h1 class="q-title">How healthy ${i === 0 ? "are you" : `is ${label(i)}`} in a typical year?</h1>
     <div class="pill-row" role="group" aria-label="Choose a person">
       ${state.members.map((mm, k) => `<button class="pill ${k === i ? "on" : ""}" data-person="${k}" style="${k === i ? "background:var(--ink);color:#fff;border-color:var(--ink)" : ""}">${label(k)} · ${mm.age}</button>`).join("")}</div>
@@ -300,7 +449,7 @@ screens.health = () => {
         <button class="choice ${m.profile === v ? "on" : ""}" data-prof="${v}" role="radio" aria-checked="${m.profile === v}">
           <span><span class="t">${title}</span><span class="s">${sub}</span>
             <span class="s" style="margin-top:6px;border-top:1px solid var(--line-soft);padding-top:6px;color:#2E3A38">${stat}</span></span>
-          ${m.profile === v ? `<span class="check-pop">✓</span>` : ""}</button>`).join("")}
+          ${m.profile === v ? `<span class="check-pop">${check}</span>` : ""}</button>`).join("")}
     </div>
     <p class="disclaimer">Numbers are for privately insured people ${m.sex === "F" ? "(women)" : m.sex === "M" ? "(men)" : ""} ${bandLabel(m.age)}, from a national survey of about 24,000 people a year.</p>
     ${state.mode === "quick" ? `<div class="card" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;background:var(--bg)">
@@ -344,7 +493,8 @@ screens.care = () => {
   const val = (k) => (m.edits[k] ?? Math.round(t[k]));
   app.innerHTML = `
   <div class="narrow stack ${enter()}">
-    <h1 class="q-title">What care ${i === 0 ? "do you" : `does ${label(i)}`} expect in 2027?</h1>
+    ${guide("ax-wave", "peek")}
+    <h1 class="q-title" style="padding-right:96px">What care ${i === 0 ? "do you" : `does ${label(i)}`} expect in 2027?</h1>
     <p class="q-sub">We've filled in what's typical. Change anything you know will be different.</p>
     <div class="pill-row">${state.members.map((mm, k) => `<button class="pill ${k === i ? "on" : ""}" data-person="${k}" style="${k === i ? "background:var(--ink);color:#fff;border-color:var(--ink)" : ""}">${label(k)} · ${mm.age}</button>`).join("")}</div>
     <section class="card stack" style="gap:12px">
@@ -413,8 +563,9 @@ screens.review = () => {
     m.profile === "healthy" ? "healthy" : m.profile === "typical" ? "typical" : "ongoing condition"}`).join(" · ");
   app.innerHTML = `
   <div class="narrow stack ${enter()}">
-    <span class="assure">You can change anything later</span>
-    <h1 class="q-title">Ready to compare plans</h1>
+    ${guide("ax-happy")}
+    <span class="assure">${icoLeaf} You can change anything later</span>
+    <h1 class="q-title">Ready to compare plans ${icoSparkle}</h1>
     <div class="card" style="padding:0;overflow:hidden">
       ${[["Where you live", `${state.zip} · ${state.county[2]}`, "zip"],
          ["Who's covered", state.members.map((m) => m.age).join(", ") + (state.members.some((m) => m.tobacco) ? " · tobacco" : " · no tobacco"), "household"],
@@ -436,11 +587,20 @@ screens.review = () => {
 
 /* ---------------- results ---------------- */
 async function runResults() {
-  app.innerHTML = `<div class="narrow stack" style="align-items:center;padding:48px 0">
+  app.innerHTML = `<div class="narrow stack" style="align-items:center;padding:40px 0">
+    <div id="swim-strip" style="position:relative;width:100%;height:110px;overflow:hidden">
+      ${bubbles(5)}
+      <span id="swim-ax" style="position:absolute;left:0;top:10px;display:block">${axolotl("", 96)}</span>
+    </div>
     <div class="gl-track" style="width:min(420px,80%)"><div class="gl-clip" style="clip-path:inset(-14px 20% -14px -14px round 999px)">
       <span class="gl-glow"></span><div class="gl-fill"><span class="gl-shim"></span></div></div></div>
-    <p style="color:var(--muted)">Pricing every plan in ${state.county[2]} against ${state.members.length === 1 ? "your care" : "your household's care"}…</p></div>`;
+    <p style="color:var(--muted)" role="status">Axel is pricing every plan in ${state.county[2]} against ${state.members.length === 1 ? "your care" : "your household's care"}…</p></div>`;
   navEl.innerHTML = "";
+  const strip = $("#swim-strip"), fish = $("#swim-ax");
+  if (G && !RM && strip) {
+    G.fromTo(fish, { x: -120 }, { x: strip.offsetWidth + 120, duration: 2.8, ease: "none", repeat: -1 });
+    G.to(fish, { y: 14, duration: 0.9, ease: "sine.inOut", yoyo: true, repeat: -1 });
+  }
   await new Promise((r) => setTimeout(r, 30));
   const e = await engineFor(state.county[1]);
   const members = state.members.map((m) => {
@@ -459,6 +619,7 @@ async function runResults() {
   });
   const hh = { zip: state.zip, income: Number(state.income), members };
   state.results = e.rank(hh, 300, 7);
+  state.pondShown = false;
   state.scenario = "typical";
   state.shownTiers = 1;
   go("results");
@@ -476,6 +637,27 @@ function explain(p) {
   return `A middle ground: copays for routine care, the deductible for bigger events.`;
 }
 
+function pondScene(planCount) {
+  return `
+  <section class="pond">
+    <h2>You made it home!</h2>
+    <p class="pond-note">Axel priced ${planCount} plans for your household. The ones below cost the least for your year.</p>
+    <svg class="pond-scene" viewBox="0 0 600 200" fill="none" role="img" aria-label="Axel the axolotl relaxing in his pond">
+      <circle cx="524" cy="34" r="20" fill="#FFD166" opacity="0.9"/>
+      <g class="reed"><path d="M60 150 C58 110 62 86 56 62" stroke="#2E8B57" stroke-width="5" stroke-linecap="round"/><ellipse cx="55" cy="54" rx="7" ry="16" fill="#8A5A2B"/></g>
+      <g class="reed b"><path d="M86 154 C86 122 90 104 86 84" stroke="#2E8B57" stroke-width="4.5" stroke-linecap="round"/><ellipse cx="86" cy="76" rx="6" ry="14" fill="#A2691F"/></g>
+      <g class="reed"><path d="M545 158 C545 128 540 112 544 94" stroke="#2E8B57" stroke-width="4.5" stroke-linecap="round"/><ellipse cx="544" cy="86" rx="6" ry="14" fill="#8A5A2B"/></g>
+      <path d="M0 128 Q75 116 150 126 T300 124 T450 126 T600 122 V200 H0 Z" fill="#7ED7EA"/>
+      <g class="lily"><ellipse cx="140" cy="150" rx="30" ry="10" fill="#43A96C"/><path d="M140 150 L168 144 L166 154 Z" fill="#7ED7EA"/><circle cx="128" cy="140" r="6" fill="#FF9DB0"/><circle cx="128" cy="136" r="3.4" fill="#FFD1DB"/></g>
+      <g class="lily b"><ellipse cx="470" cy="162" rx="36" ry="11" fill="#3B9A61"/><path d="M470 162 L500 156 L498 166 Z" fill="#5BC9E2"/></g>
+      <ellipse class="pond-ring" cx="300" cy="150" rx="70" ry="12" stroke="#fff" stroke-width="3" fill="none" opacity="0"/>
+      <g class="pond-ax"><svg class="ax ax-happy" x="225" y="26" width="150" viewBox="0 0 220 190">${axBody()}</svg></g>
+      <path d="M0 162 Q60 154 120 162 T240 160 T360 162 T480 159 T600 162 V200 H0 Z" fill="#5BC9E2"/>
+      <path class="wave-line" d="M-80 176 Q-40 170 0 176 T80 176 T160 176 T240 176 T320 176 T400 176 T480 176 T560 176 T640 176 T720 176" stroke="rgba(255,255,255,0.55)" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+  </section>`;
+}
+
 screens.results = () => {
   const res = state.results;
   const key = { typical: "typical_total", bad: "bad_year_total", worst: "worst_total" }[state.scenario];
@@ -490,6 +672,7 @@ screens.results = () => {
 
   app.innerHTML = `
   <div class="narrow stack ${enter()}">
+    ${pondScene(res.plans.length)}
     <div class="card" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px">
       <span><b>${res.county} · ${state.members.length} ${state.members.length > 1 ? "people" : "person"}</b>
         <span style="font-size:13px;color:var(--muted);display:block">$${Number(state.income).toLocaleString()} income · tax credit $${Math.round(res.aptc_month).toLocaleString()}/mo${res.variant !== "base" ? " · extra silver savings applied" : ""}</span></span>
@@ -515,6 +698,7 @@ screens.results = () => {
   $("#edit-answers").onclick = () => go("review", -1);
   app.querySelectorAll("[data-scen]").forEach((b) => b.onclick = () => { state.scenario = b.dataset.scen; screens.results(); });
   const more = $("#more"); if (more) more.onclick = () => { state.shownTiers = 2; screens.results(); };
+  pondArrive();
   app.querySelectorAll("[data-math]").forEach((b) => b.onclick = () => {
     const el = $(`#math-${b.dataset.math}`);
     const open = el.style.display !== "none";
@@ -554,7 +738,7 @@ function planCard(p, i, low, key, maxShown) {
 
 /* ---------------- boot ---------------- */
 const enter = () => (state.dir >= 0 ? "enter-fwd" : "enter-back");
-function render() { renderChrome(); screens[state.screen](); }
+function render() { renderChrome(); screens[state.screen](); animateIn(); }
 document.addEventListener("click", (e) => {
   const g = e.target.closest("[data-go]");
   if (g) go(g.dataset.go, -1);
