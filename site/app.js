@@ -1,4 +1,4 @@
-/* Plan cost estimator - the site. Loads the packed data, runs the engine in the
+/* ClearYear - the site. Loads the packed data, runs the engine in the
    browser, and walks the user through the guided flow. Nothing typed here leaves
    the page: there is no backend and no analytics on answers. */
 import { Engine } from "./assets/engine.js";
