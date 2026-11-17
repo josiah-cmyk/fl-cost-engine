@@ -259,8 +259,8 @@ screens.income = () => {
     const csrNote = fpl < 100 ?
       `Below the poverty line, Florida has no tax credit and no expanded Medicaid. We'll still rank plans by full price, and your kids may qualify for low-cost KidCare.` :
       fpl > 400 ? `Above four times the poverty line there's no tax credit in 2027, so the full premium applies.` :
-      csr !== "base" ? `You also qualify for extra help with deductibles and copays on silver plans.` :
-      `Your income gets a tax credit but is above the cutoff for extra deductible help, which ends at 250% of the poverty level.`;
+      csr !== "base" ? `You also qualify for extra silver savings: lower deductibles and copays on silver plans.` :
+      `Your income gets a tax credit but is above the cutoff for the extra silver savings, which end at 250% of the poverty level.`;
     $("#credit").innerHTML = `
       <div class="card reveal" role="status" style="background:var(--mint-soft);border-color:var(--mint-line)">
         <span style="font-size:14px;color:#2E3A38">Estimated tax credit</span>
@@ -287,7 +287,7 @@ screens.health = () => {
     ["typical", "Typical for their age", "Not sure? This is a safe choice",
      `About ${visits} visits and ${fills} prescription fills`],
     ["ongoing", "Ongoing condition", "Diabetes, blood pressure, asthma, depression or similar",
-     `About ${Math.round(tOngoing.primary_care_visits + tOngoing.specialist_visits + tOngoing.preventive_visits + tOngoing.mental_health_visits)} visits and ${Math.round(tOngoing.generic_rx_30day + tOngoing.brand_rx_30day + tOngoing.specialty_rx_30day)} fills`],
+     `About ${Math.round(tOngoing.primary_care_visits + tOngoing.specialist_visits + tOngoing.preventive_visits + tOngoing.mental_health_visits)} visits and ${Math.round(tOngoing.generic_rx_30day + tOngoing.brand_rx_30day + tOngoing.specialty_rx_30day)} prescription fills`],
   ];
   app.innerHTML = `
   <div class="narrow stack ${enter()}">
@@ -351,7 +351,7 @@ screens.care = () => {
       <h2 style="margin:0;font-size:18px">Ongoing conditions</h2>
       <div class="pill-row">${CONDS.map(([k, name]) => `
         <label class="pill ${m.conditions.includes(k) ? "on" : ""}"><input type="checkbox" data-cond="${k}" ${m.conditions.includes(k) ? "checked" : ""}>${name}</label>`).join("")}</div>
-      <p class="disclaimer" style="margin:0">Picking any condition switches this person's starting numbers to the ongoing-condition profile. List their prescriptions below for exact drug costs.</p>
+      <p class="disclaimer" style="margin:0">Picking any condition switches this person's starting numbers to the ongoing-condition profile. List their prescriptions below for exact prescription costs.</p>
     </section>
     <section class="card stack" style="gap:0">
       <h2 style="margin:0 0 6px;font-size:18px">Visits in a year</h2>
@@ -371,7 +371,7 @@ screens.care = () => {
         ${m.drugs.map((d, k) => `<li><span><b>${d.name}</b> <span style="font-size:13px;color:var(--muted)">· about $${Math.round(d.fill).toLocaleString()} a fill · monthly</span></span>
           <button class="btn plain" data-deldrug="${k}" style="font-size:14px;text-decoration:underline">Remove</button></li>`).join("")}
       </ul>
-      <p class="disclaimer" style="margin:0">Prices come from the government's weekly pharmacy cost file, with a typical markup. Listing drugs replaces the average prescription numbers above for this person.</p>
+      <p class="disclaimer" style="margin:0">Prices come from the government's weekly pharmacy cost file, with a typical markup. Listing prescriptions replaces the typical fill counts for this person.</p>
     </section>
   </div>`;
   app.querySelectorAll("[data-person]").forEach((b) => b.onclick = () => { state.careIdx = +b.dataset.person; screens.care(); });
@@ -472,7 +472,7 @@ function explain(p) {
   if (pcp && pcp[0] > 0 && !pcp[2] && spec && spec[0] > 0 && !spec[2])
     return `Doctor visits are flat copays ($${pcp[0]} primary, $${spec[0]} specialist), so most care skips the deductible.`;
   if (pcp && pcp[3]) return `Primary care is free on this plan; the deductible applies mainly to bigger care.`;
-  if (p.ded_person === 0) return `No deductible: cost sharing starts at copays right away.`;
+  if (p.ded_person === 0) return `No deductible: copays apply right away.`;
   return `A middle ground: copays for routine care, the deductible for bigger events.`;
 }
 
@@ -534,7 +534,7 @@ function planCard(p, i, low, key, maxShown) {
     <div class="plan-top">
       <div><h3 class="plan-name">${p.issuer}</h3>
         <div class="plan-meta">${p.plan}</div>
-        <div class="plan-meta">${p.metal} · ${p.type} · $${Math.round(p.ded_person ?? 0).toLocaleString()} deductible · $${Math.round(p.moop_person ?? 0).toLocaleString()} out-of-pocket max</div></div>
+        <div class="plan-meta">${p.metal} · ${p.type} · $${Math.round(p.ded_person ?? 0).toLocaleString()} deductible · $${Math.round(p.moop_person ?? 0).toLocaleString()} out-of-pocket limit</div></div>
       <div class="plan-price"><b>$${p[key].toLocaleString()}</b><span>for 2027</span></div></div>
     <div class="cost-bar" aria-hidden="true"><span class="worst" style="width:${worstPct}%"></span><span class="typ" style="width:${typPct}%"></span></div>
     <div style="display:flex;justify-content:space-between;font-size:13px;color:#2E3A38">
