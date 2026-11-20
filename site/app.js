@@ -376,6 +376,78 @@ screens.household = () => {
   nav(`${backBtn}<button class="btn big" id="btn-next">Continue ${arrow}</button>`);
 };
 
+/* Plain-language explanation of the premium help, in dollars for this household.
+   Bands: under 100% of the poverty line = coverage gap, 100-250% = most help,
+   250-400% = some help, over 400% = full price. */
+const usd = (n) => "$" + Math.round(n).toLocaleString();
+function helpCard(e, hh, income, fpl, aptc) {
+  const line = (income * 100) / fpl;              // the poverty line, in dollars, for this household size
+  const at = (pct) => (line * pct) / 100;
+  const n = hh.members.length;
+  const size = n === 1 ? "a household of one" : `a household of ${n}`;
+  const kids = hh.members.some((m) => m.age < 19);
+  const band = fpl < 100 ? "gap" : fpl <= 250 ? "most" : fpl <= 400 ? "some" : "full";
+
+  // Help meter: four zones drawn at fixed widths so the labels always fit.
+  const zones = [["gap", "Gap", 0, 100, 20], ["most", "Most help", 100, 250, 30],
+                 ["some", "Some help", 250, 400, 30], ["full", "Full price", 400, 520, 20]];
+  let x = 0, pos = 0;
+  for (const [, , lo, hi, w] of zones) {
+    if (fpl >= lo && (fpl < hi || hi === 520)) pos = x + w * Math.min(1, (fpl - lo) / (hi - lo));
+    x += w;
+  }
+  const meter = `
+    <div class="help-meter" aria-hidden="true">
+      <div class="hm-bar">${zones.map(([k, , , , w]) => `<span class="hm-z hm-${k}${k === band ? " on" : ""}" style="width:${w}%"></span>`).join("")}
+        <span class="hm-you" style="left:${Math.min(95, Math.max(5, pos))}%"><b>You</b></span></div>
+      <div class="hm-labels">${zones.map(([k, lab, lo, , w]) => `<span style="width:${w}%" class="${k === band ? "on" : ""}">${lab}<small>${lo === 0 ? `under ${usd(at(100))}` : k === "full" ? `over ${usd(at(400))}` : `${usd(at(lo))}+`}</small></span>`).join("")}</div>
+    </div>`;
+
+  let head, body;
+  if (band === "gap") {
+    head = "You're in Florida's coverage gap";
+    body = `
+      <p>The marketplace discount starts at <b>${usd(at(100))} a year</b> for ${size}. The law assumed anyone earning less would get Medicaid instead. Florida never expanded Medicaid, so most adults below that amount get neither. That's a gap in the law, and nothing you did caused it.</p>
+      <p class="hm-sub">Where to get help instead</p>
+      <ul class="hm-list">
+        ${kids ? `<li>Your kids can likely get free or low-cost coverage through <a href="https://www.floridakidcare.org" rel="noopener">Florida KidCare</a>.</li>` : ""}
+        <li>Parents with very low incomes may qualify for Medicaid. Check at <a href="https://myaccess.myflfamilies.com" rel="noopener">ACCESS Florida</a>.</li>
+        <li>Community health centers charge based on income, often $20 or less a visit. <a href="https://findahealthcenter.hrsa.gov" rel="noopener">Find one near you</a>.</li>
+        <li>Nonprofit hospitals have to offer financial help with bills. Ask for their financial assistance form.</li>
+        <li>Call 211 for local programs in your county.</li>
+      </ul>
+      <p>We'll still rank the plans below at full price in case you want to buy one.</p>`;
+  } else if (band === "full") {
+    head = "You'd pay full price";
+    body = `
+      <p>The discount stops at <b>${usd(at(400))} a year</b> for ${size}. Above that, there's no help in 2027, so you pay each plan's sticker price.</p>
+      <p>It's a hard cutoff. If you're close, money you put into a pre-tax 401(k) or HSA lowers the income that counts and could bring you back under it.</p>
+      <p>Plans still differ by thousands in what you'd really pay for the year. That's what we rank next.</p>`;
+  } else {
+    const ap = e.applicablePct(fpl);
+    const bench = e.slcsp(state.county[0], hh.members);
+    const share = (income * ap) / 100 / 12;
+    head = band === "most" ? "You get the most help" : "You get help with your premium";
+    body = `
+      <p class="hm-eq"><span>A standard silver plan here costs about <b>${usd(bench)}</b> a month.</span>
+        <span>At your income, you're expected to pay <b>${usd(share)}</b> of it.</span>
+        <span>The government pays the other <b>${usd(aptc)}</b> straight to your insurer.</span></p>
+      <p>That monthly discount is the tax credit. You don't need to owe any taxes to get it. It works on any plan, so cheaper plans can cost you very little or nothing.</p>
+      ${band === "most"
+        ? `<p>Because your income is under ${usd(at(250))}, silver plans also come with <b>lower deductibles and copays</b> for you. We call that extra silver savings.</p>`
+        : `<p>Lower deductibles on silver plans stop at ${usd(at(250))}, so that extra piece doesn't apply to you.</p>`}`;
+  }
+
+  return `
+    <div class="card reveal help-card" role="status">
+      <span class="hm-kicker">Your help paying for a plan</span>
+      <h2 class="hm-head">${head}</h2>
+      <div class="hm-amt${aptc > 0 ? "" : " zero"}">${usd(aptc)}<span> a month off your premium${aptc > 0 ? `, about ${usd(aptc * 12)} for the year` : ""}</span></div>
+      ${meter}
+      <div class="hm-body">${body}</div>
+    </div>`;
+}
+
 screens.income = () => {
   app.innerHTML = `
   <div class="narrow stack ${enter()}">
@@ -402,18 +474,7 @@ screens.income = () => {
     const hh = { zip: state.zip, income: v, members: state.members };
     const fpl = e.fplPct(hh);
     const aptc = e.aptcMonthly(hh, state.county[0]);
-    const csr = e.csrVariant(fpl);
-    const csrNote = fpl < 100 ?
-      `Below the poverty line, Florida has no tax credit and no expanded Medicaid. We'll still rank plans by full price, and your kids may qualify for low-cost KidCare.` :
-      fpl > 400 ? `Above four times the poverty line there's no tax credit in 2027, so the full premium applies.` :
-      csr !== "base" ? `You also qualify for extra silver savings: lower deductibles and copays on silver plans.` :
-      `Your income gets a tax credit but is above the cutoff for the extra silver savings, which end at 250% of the poverty level.`;
-    $("#credit").innerHTML = `
-      <div class="card reveal" role="status" style="background:var(--mint-soft);border-color:var(--mint-line)">
-        <span style="font-size:14px;color:#2E3A38">Estimated tax credit</span>
-        <div style="font-size:36px;font-weight:700;letter-spacing:-0.02em;color:var(--teal)">
-          $${Math.round(aptc).toLocaleString()}<span style="font-size:16px;color:var(--muted);font-weight:500"> a month</span></div>
-        <p style="margin:6px 0 0;font-size:15px;color:#2E3A38">${aptc > 0 ? `That's about $${Math.round(aptc * 12).toLocaleString()} off your premiums for the year. ` : ""}${csrNote}</p></div>`;
+    $("#credit").innerHTML = helpCard(e, hh, v, fpl, aptc);
     const g = $("#ax-here .ax"); if (g) g.classList.toggle("ax-happy", aptc > 0);
   };
   inp.oninput = () => { inp.value = inp.value.replace(/[^0-9]/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ","); show(); };

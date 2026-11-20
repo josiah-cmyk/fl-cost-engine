@@ -329,3 +329,36 @@ details.why summary { cursor: pointer; font-weight: 800; color: var(--palm); }
   .pond .lily, .pond .reed, .pond .wave-line { animation: none; }
   @keyframes fade { from { opacity: 0; } }
 }
+
+/* ---------- Help card: the premium help explained in plain dollars ---------- */
+.help-card { background: var(--mint-soft); border-color: var(--mint-line); display: flex; flex-direction: column; gap: 10px; }
+.hm-kicker { font-size: 14px; font-weight: 700; color: var(--muted); }
+.hm-head { margin: 0; font-size: 24px; line-height: 1.2; }
+.hm-amt { font-family: "Baloo 2", "Nunito", sans-serif; font-size: 36px; font-weight: 700; line-height: 1.1; color: var(--palm); font-variant-numeric: tabular-nums; }
+.hm-amt span { font-family: "Nunito", sans-serif; font-size: 15px; font-weight: 600; color: var(--muted); }
+.help-meter { margin: 18px 0 4px; }
+.hm-bar { position: relative; display: flex; gap: 3px; height: 14px; }
+.hm-z { border-radius: 4px; opacity: 0.38; }
+.hm-z:first-child { border-radius: 999px 4px 4px 999px; }
+.hm-z:last-of-type { border-radius: 4px 999px 999px 4px; }
+.hm-z.on { opacity: 1; }
+.hm-gap { background: #C9BB9B; }
+.hm-most { background: var(--palm); }
+.hm-some { background: var(--lagoon-deep); }
+.hm-full { background: var(--coral); }
+.hm-you { position: absolute; top: -22px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+.hm-you b { font-size: 12px; font-weight: 800; color: #fff; background: var(--ink); padding: 1px 8px; border-radius: 999px; }
+.hm-you::after { content: ""; width: 3px; height: 22px; margin-top: 2px; border-radius: 2px; background: var(--ink); }
+.hm-labels { display: flex; gap: 3px; margin-top: 8px; font-size: 12.5px; color: var(--muted); line-height: 1.25; }
+.hm-labels span { display: flex; flex-direction: column; }
+.hm-labels span.on { color: var(--ink); font-weight: 800; }
+.hm-labels small { font-size: 11.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.hm-body { font-size: 15.5px; color: #2E3A38; }
+.hm-body p { margin: 8px 0 0; max-width: 62ch; }
+.hm-eq { display: flex; flex-direction: column; gap: 6px; background: var(--card); border: 1px solid var(--mint-line); border-radius: 14px; padding: 12px 14px; }
+.hm-eq span { padding-left: 16px; position: relative; }
+.hm-eq span::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 7px; height: 7px; border-radius: 999px; background: var(--lagoon); }
+.hm-sub { font-weight: 800; color: var(--ink); }
+.hm-list { margin: 6px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+@media (max-width: 420px) { .hm-labels { font-size: 11.5px; } .hm-labels small { font-size: 10.5px; } }
+.hm-amt.zero { color: var(--muted); }
