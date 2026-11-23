@@ -13,42 +13,64 @@ if (!G) document.documentElement.classList.add("no-gsap");
 
 let axN = 0;
 /* Inner markup of the axolotl, so he can live in plain HTML or inside a scene SVG. */
+// Axel: chibi proportions (big wide head, small round body), low-set glossy eyes,
+// oversized round glasses sitting a little crooked, cat-mouth smile, blush, paddle gills.
 function axBody() {
   const id = "axg" + (++axN);
-  const skin = 'fill="rgba(165,233,255,0.9)" stroke="rgba(46,125,156,0.7)" stroke-width="3" stroke-linejoin="round"';
-  const gill = 'fill="#64C9EC" stroke="rgba(46,125,156,0.65)" stroke-width="2.5" stroke-linejoin="round"';
+  const line = 'stroke="rgba(52,128,168,0.75)" stroke-width="2.6" stroke-linejoin="round"';
+  const skin = `fill="url(#${id}b)" ${line}`;
+  // A gill is a short rounded paddle, fat at the tip, with soft fringe lines. The rotation lives
+  // on an inner group so the CSS sway on .ax-gill still works.
+  const gill = (cls, bx, by, deg, k = 1) => `<g class="ax-gill ${cls}"><g transform="translate(${bx} ${by}) rotate(${deg}) scale(${k})">
+      <path d="M0 -4 C9 -6 15 -12 23 -12 C33 -12 36 -4 36 0 C36 4 33 12 23 12 C15 12 9 6 0 4 Z" fill="url(#${id}g)" stroke="rgba(52,128,168,0.7)" stroke-width="2.4" stroke-linejoin="round"/>
+      <path d="M14 -2 L30 -7 M16 0 L33 0 M14 2 L30 7" stroke="rgba(255,255,255,0.65)" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="27" cy="-6" r="2.2" fill="#fff" opacity="0.8"/></g></g>`;
   return `
-  <defs><filter id="${id}" x="-40%" y="-40%" width="180%" height="180%">
-    <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#7FDFFF" flood-opacity="0.7"/>
-  </filter></defs>
+  <defs>
+    <filter id="${id}" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#86E3FF" flood-opacity="0.75"/>
+    </filter>
+    <radialGradient id="${id}b" cx="40%" cy="28%" r="80%">
+      <stop offset="0" stop-color="rgba(240,252,255,0.97)"/>
+      <stop offset="0.55" stop-color="rgba(178,236,255,0.93)"/>
+      <stop offset="1" stop-color="rgba(140,214,246,0.93)"/>
+    </radialGradient>
+    <linearGradient id="${id}g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8FDDFB"/><stop offset="1" stop-color="#C3B4FF"/>
+    </linearGradient>
+  </defs>
   <g class="ax-all" filter="url(#${id})">
-    <g class="ax-tail"><path d="M146 134 C182 144 204 122 208 90 C194 106 180 106 172 98 C178 118 164 138 142 126 Z" ${skin}/></g>
-    <ellipse cx="108" cy="130" rx="46" ry="36" ${skin}/>
-    <ellipse cx="106" cy="140" rx="25" ry="16" fill="rgba(236,251,255,0.85)"/>
-    <g class="ax-arm-l"><path d="M80 140 q-13 13 -5 26 q10 5 15 -5 q3 -12 -10 -21 Z" ${skin}/></g>
-    <path d="M138 140 q13 13 5 26 q-10 5 -15 -5 q-3 -12 10 -21 Z" ${skin}/>
+    <g class="ax-tail"><path d="M134 150 C160 158 184 146 196 118 C200 110 192 106 186 112 C176 126 160 132 140 134 Z" ${skin}/>
+      <path d="M150 140 C166 140 180 132 188 118" stroke="rgba(195,180,255,0.7)" stroke-width="4" stroke-linecap="round" fill="none"/></g>
+    <ellipse cx="108" cy="142" rx="35" ry="28" ${skin}/>
+    <ellipse cx="108" cy="148" rx="20" ry="15" fill="rgba(245,253,255,0.9)"/>
+    <ellipse cx="92" cy="168" rx="10" ry="6.5" ${skin}/><ellipse cx="124" cy="168" rx="10" ry="6.5" ${skin}/>
+    <g class="ax-arm-l"><ellipse cx="76" cy="150" rx="8" ry="12.5" transform="rotate(28 76 150)" ${skin}/></g>
+    <ellipse cx="140" cy="150" rx="8" ry="12.5" transform="rotate(-28 140 150)" ${skin}/>
     <g class="ax-head">
-      <g class="ax-gill l1"><path d="M64 50 Q42 32 38 14 Q62 24 74 44 Z" ${gill}/><circle cx="50" cy="30" r="2.6" fill="#CFF2FF"/></g>
-      <g class="ax-gill l2"><path d="M56 70 Q30 62 18 48 Q46 50 62 62 Z" ${gill}/><circle cx="34" cy="56" r="2.6" fill="#CFF2FF"/></g>
-      <g class="ax-gill l3"><path d="M58 88 Q34 94 24 110 Q50 104 64 92 Z" ${gill}/><circle cx="38" cy="100" r="2.6" fill="#CFF2FF"/></g>
-      <g class="ax-gill r1"><path d="M148 50 Q170 32 174 14 Q150 24 138 44 Z" ${gill}/><circle cx="162" cy="30" r="2.6" fill="#CFF2FF"/></g>
-      <g class="ax-gill r2"><path d="M156 70 Q182 62 194 48 Q166 50 150 62 Z" ${gill}/><circle cx="178" cy="56" r="2.6" fill="#CFF2FF"/></g>
-      <g class="ax-gill r3"><path d="M154 88 Q178 94 188 110 Q162 104 148 92 Z" ${gill}/><circle cx="174" cy="100" r="2.6" fill="#CFF2FF"/></g>
-      <ellipse cx="106" cy="76" rx="50" ry="44" fill="rgba(165,233,255,0.94)" stroke="rgba(46,125,156,0.7)" stroke-width="3"/>
-      <circle cx="70" cy="96" r="6" fill="rgba(255,126,103,0.4)"/><circle cx="142" cy="96" r="6" fill="rgba(255,126,103,0.4)"/>
-      <circle cx="86" cy="78" r="13" fill="#fff" stroke="rgba(46,125,156,0.4)" stroke-width="1.5"/>
-      <circle cx="126" cy="78" r="13" fill="#fff" stroke="rgba(46,125,156,0.4)" stroke-width="1.5"/>
-      <circle cx="87" cy="79" r="6.5" fill="#1E3A34"/><circle cx="127" cy="79" r="6.5" fill="#1E3A34"/>
-      <circle cx="84" cy="75" r="2.6" fill="#fff"/><circle cx="124" cy="75" r="2.6" fill="#fff"/>
-      <circle cx="90" cy="82" r="1.3" fill="#fff" opacity="0.85"/><circle cx="130" cy="82" r="1.3" fill="#fff" opacity="0.85"/>
-      <g class="ax-lids"><circle cx="86" cy="78" r="13.5" fill="#A5E9FF"/><circle cx="126" cy="78" r="13.5" fill="#A5E9FF"/></g>
-      <g transform="rotate(-5 106 80)" fill="none" stroke="#E8604A" stroke-width="5" stroke-linecap="round">
-        <circle cx="86" cy="79" r="19" fill="rgba(255,255,255,0.13)"/>
-        <circle cx="126" cy="79" r="19" fill="rgba(255,255,255,0.13)"/>
-        <path d="M100 73 Q106 66 112 73"/>
-        <path d="M67 75 L57 69"/><path d="M145 75 L155 69"/>
+      ${gill("l1", 70, 52, -128, 0.95)}
+      ${gill("l2", 56, 74, -172, 1.05)}
+      ${gill("l3", 60, 98, 150, 0.95)}
+      ${gill("r1", 150, 52, -52, 0.95)}
+      ${gill("r2", 164, 74, -8, 1.05)}
+      ${gill("r3", 160, 98, 30, 0.95)}
+      <ellipse cx="110" cy="80" rx="62" ry="47" ${skin}/>
+      <circle cx="98" cy="44" r="2.4" fill="rgba(110,190,230,0.7)"/><circle cx="110" cy="40" r="2.8" fill="rgba(110,190,230,0.7)"/><circle cx="122" cy="44" r="2.4" fill="rgba(110,190,230,0.7)"/>
+      
+      <ellipse cx="84" cy="90" rx="11.5" ry="12.5" fill="#20384A"/><ellipse cx="136" cy="90" rx="11.5" ry="12.5" fill="#20384A"/>
+      <circle cx="80" cy="85" r="4.6" fill="#fff"/><circle cx="132" cy="85" r="4.6" fill="#fff"/>
+      <circle cx="88.5" cy="95" r="2" fill="#fff" opacity="0.9"/><circle cx="140.5" cy="95" r="2" fill="#fff" opacity="0.9"/>
+      <g class="ax-lids"><ellipse cx="84" cy="90" rx="13" ry="14" fill="#B8EBFF"/><ellipse cx="136" cy="90" rx="13" ry="14" fill="#B8EBFF"/></g>
+      <path d="M101 104 Q105.5 109.5 110 104 Q114.5 109.5 119 104" stroke="#20384A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <g transform="rotate(-4 110 90)">
+        <circle cx="84" cy="90" r="21" fill="rgba(255,255,255,0.14)" stroke="#FF7E67" stroke-width="4.5"/>
+        <circle cx="137" cy="90" r="22.5" fill="rgba(255,255,255,0.14)" stroke="#FF7E67" stroke-width="4.5"/>
+        <path d="M104 86 Q110.5 80 116 86" stroke="#FF7E67" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+        <path d="M64 86 L54 80" stroke="#FF7E67" stroke-width="4.5" stroke-linecap="round"/><path d="M158.5 86 L168 80" stroke="#FF7E67" stroke-width="4.5" stroke-linecap="round"/>
+        <path d="M93 76 Q98 80 99 86" stroke="rgba(255,255,255,0.85)" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <path d="M147 75 Q152 79 153 86" stroke="rgba(255,255,255,0.85)" stroke-width="3" stroke-linecap="round" fill="none"/>
       </g>
-      <path d="M96 102 Q106 112 116 102" stroke="#1E3A34" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <ellipse cx="62" cy="113" rx="9.5" ry="5.5" fill="rgba(255,138,170,0.55)"/><ellipse cx="158" cy="113" rx="9.5" ry="5.5" fill="rgba(255,138,170,0.55)"/>
     </g>
   </g>`;
 }

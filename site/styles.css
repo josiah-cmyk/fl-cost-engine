@@ -55,12 +55,12 @@ header.site .wrap {
 .ax { display: block; overflow: visible; }
 .ax .ax-all { transform-origin: 50% 60%; animation: axBob 4.2s ease-in-out infinite; }
 .ax .ax-gill { transform-box: fill-box; animation: axGill 3.4s ease-in-out infinite; }
-.ax .ax-gill.l1 { transform-origin: 100% 85%; }
-.ax .ax-gill.l2 { transform-origin: 100% 60%; animation-delay: 0.25s; }
-.ax .ax-gill.l3 { transform-origin: 100% 40%; animation-delay: 0.5s; }
-.ax .ax-gill.r1 { transform-origin: 0% 85%; animation-direction: alternate-reverse; }
-.ax .ax-gill.r2 { transform-origin: 0% 60%; animation-delay: 0.25s; animation-direction: alternate-reverse; }
-.ax .ax-gill.r3 { transform-origin: 0% 40%; animation-delay: 0.5s; animation-direction: alternate-reverse; }
+.ax .ax-gill.l1 { transform-origin: 100% 100%; }
+.ax .ax-gill.l2 { transform-origin: 100% 50%; animation-delay: 0.25s; }
+.ax .ax-gill.l3 { transform-origin: 100% 10%; animation-delay: 0.5s; }
+.ax .ax-gill.r1 { transform-origin: 0% 100%; animation-direction: alternate-reverse; }
+.ax .ax-gill.r2 { transform-origin: 0% 50%; animation-delay: 0.25s; animation-direction: alternate-reverse; }
+.ax .ax-gill.r3 { transform-origin: 0% 10%; animation-delay: 0.5s; animation-direction: alternate-reverse; }
 .ax .ax-tail { transform-box: fill-box; transform-origin: 15% 50%; animation: axTail 3.6s ease-in-out infinite; }
 .ax .ax-lids { transform-box: fill-box; transform-origin: 50% 50%; transform: scaleY(0); animation: axBlink 5.5s linear infinite; }
 .ax .ax-arm-l { transform-box: fill-box; transform-origin: 80% 15%; }
@@ -84,7 +84,7 @@ header.site .wrap {
 /* Peek: only his head shows above a little pool, the rest is under water */
 .ax-guide.peek .peek-box { position: absolute; right: 0; top: -34px; width: 120px; height: 96px; }
 .ax-guide.peek .peek-clip { position: absolute; left: -26px; right: -26px; top: -50px; bottom: 18px; overflow: hidden; }
-.ax-guide.peek .peek-ax { position: absolute; left: 32px; top: 60px; }
+.ax-guide.peek .peek-ax { position: absolute; left: 32px; top: 68px; }
 .ax-guide.peek .peek-ax .ax { position: static; width: 108px; }
 .ax-guide.peek .peek-water { position: absolute; left: -10px; bottom: 0; width: 140px; height: 30px; }
 @media (max-width: 700px) { .ax-guide.peek .peek-box { transform: scale(0.8); transform-origin: top right; right: 10px; } }
