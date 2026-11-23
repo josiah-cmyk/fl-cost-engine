@@ -1,4 +1,4 @@
-/* Axel the axolotl. Returns the inner markup of a 220 x 190 SVG so he can live in plain
+/* Lolo the axolotl. Returns the inner markup of a 220 x 190 SVG so he can live in plain
    HTML or inside a scene. Poses are CSS classes on the outer <svg class="ax ...">:
      ax-wave   left arm waves              ax-tilt  head tilts, glasses slip and pop back
      ax-happy  bouncy body                 ax-joy   happy ^ ^ eyes

@@ -1,4 +1,4 @@
-import { axBody } from "./axel.js";
+import { axBody } from "./lolo.js";
 /* ClearYear - the site. Loads the packed data, runs the engine in the
    browser, and walks the user through the guided flow. Nothing typed here leaves
    the page: there is no backend and no analytics on answers. */
@@ -7,7 +7,7 @@ import { Engine } from "./assets/engine.js";
 const $ = (sel, el = document) => el.querySelector(sel);
 const app = $("#app"), navEl = $("#nav"), progEl = $("#progress"), modeChip = $("#mode-chip");
 
-/* ---------------- Axel the axolotl + motion setup ---------------- */
+/* ---------------- Lolo the axolotl + motion setup ---------------- */
 const G = typeof gsap !== "undefined" ? gsap : null;
 const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
 if (!G) document.documentElement.classList.add("no-gsap");
@@ -24,7 +24,7 @@ const guide = (pose = "ax-tilt", side = "right") =>
        </div></div>`
     : `<div class="ax-guide ${side === "left" ? "left" : ""}" id="ax-here" aria-hidden="true">${axolotl(pose, 108)}</div>`;
 
-/* When he leaves a screen going forward, Axel hops and dives out of sight with a splash.
+/* When he leaves a screen going forward, Lolo hops and dives out of sight with a splash.
    He does it in a fixed overlay so the next screen can render right away. */
 function diveOut() {
   const src = $("#ax-here .ax");
@@ -66,7 +66,7 @@ const icoCoin = `<svg class="ico-bob" width="26" height="26" viewBox="0 0 20 20"
 const icoShell = `<svg class="ico-bob" width="26" height="26" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3C5.5 3 2.5 7 3 12l2.4 4h9.2L17 12c.5-5-2.5-9-7-9Z" fill="#FFB4A3" stroke="#E8604A" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 4v12M6.3 5.5 7.8 16M13.7 5.5 12.2 16" stroke="#E8604A" stroke-width="1.2" stroke-linecap="round"/></svg>`;
 const icoSparkle = `<svg class="ico-twinkle" width="26" height="26" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.5c.6 3.6 1.9 4.9 5.5 5.5-3.6.6-4.9 1.9-5.5 5.5-.6-3.6-1.9-4.9-5.5-5.5 3.6-.6 4.9-1.9 5.5-5.5Z" fill="#7ED7EA" stroke="#1793AC" stroke-width="1.3" stroke-linejoin="round"/><circle cx="15.5" cy="15" r="1.6" fill="#FFD166"/></svg>`;
 
-/* One choreographed entrance per screen: content rises, Axel swims in. */
+/* One choreographed entrance per screen: content rises, Lolo swims in. */
 function animateIn() {
   if (!G || RM) return;
   const root = app.firstElementChild;
@@ -247,7 +247,7 @@ screens.welcome = () => {
       ${bubbles(6)}
       <div id="ax-hero" style="position:relative">${axolotl("ax-wave", 190)}</div>
       <div id="ax-bubble" class="ax-say flip" style="position:absolute;left:calc(50% + 52px);right:6px;top:8px">
-        Hi, I'm Axel! I'll walk you through it.</div>
+        Hi, I'm Lolo! I'll walk you through it.</div>
     </div>
     <h1 class="q-title" style="text-align:center">Find the 2027 plan that really costs you the least</h1>
     <p class="q-sub" style="text-align:center;max-width:620px;margin:0 auto">The cheapest premium isn't always the cheapest plan. We add what your care would likely cost on each plan, then rank every plan sold in your county.</p>
@@ -616,7 +616,7 @@ async function runResults() {
     </div>
     <div class="gl-track" style="width:min(420px,80%)"><div class="gl-clip" style="clip-path:inset(-14px 20% -14px -14px round 999px)">
       <span class="gl-glow"></span><div class="gl-fill"><span class="gl-shim"></span></div></div></div>
-    <p style="color:var(--muted)" role="status">Axel is pricing every plan in ${state.county[2]} against ${state.members.length === 1 ? "your care" : "your household's care"}…</p></div>`;
+    <p style="color:var(--muted)" role="status">Lolo is pricing every plan in ${state.county[2]} against ${state.members.length === 1 ? "your care" : "your household's care"}…</p></div>`;
   navEl.innerHTML = "";
   const strip = $("#swim-strip"), fish = $("#swim-ax");
   if (G && !RM && strip) {
@@ -643,7 +643,7 @@ async function runResults() {
   const hh = { zip: state.zip, income: Number(state.income), members };
   state.results = e.rank(hh, 300, 7);
   state.pondShown = false;
-  // Pricing takes well under a second. Hold the thinking moment long enough to see Axel at work.
+  // Pricing takes well under a second. Hold the thinking moment long enough to see Lolo at work.
   if (G && !RM) await new Promise((r) => setTimeout(r, Math.max(0, 1400 - (performance.now() - started))));
   state.scenario = "typical";
   state.shownTiers = 1;
@@ -666,8 +666,8 @@ function pondScene(planCount) {
   return `
   <section class="pond">
     <h2>You made it home!</h2>
-    <p class="pond-note">Axel priced ${planCount} plans for your household. The ones below cost the least for your year.</p>
-    <svg class="pond-scene" viewBox="0 0 600 200" fill="none" role="img" aria-label="Axel the axolotl relaxing in his pond">
+    <p class="pond-note">Lolo priced ${planCount} plans for your household. The ones below cost the least for your year.</p>
+    <svg class="pond-scene" viewBox="0 0 600 200" fill="none" role="img" aria-label="Lolo the axolotl relaxing in his pond">
       <circle cx="524" cy="34" r="20" fill="#FFD166" opacity="0.9"/>
       <g class="reed"><path d="M60 150 C58 110 62 86 56 62" stroke="#2E8B57" stroke-width="5" stroke-linecap="round"/><ellipse cx="55" cy="54" rx="7" ry="16" fill="#8A5A2B"/></g>
       <g class="reed b"><path d="M86 154 C86 122 90 104 86 84" stroke="#2E8B57" stroke-width="4.5" stroke-linecap="round"/><ellipse cx="86" cy="76" rx="6" ry="14" fill="#A2691F"/></g>
