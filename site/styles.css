@@ -155,7 +155,7 @@ header.site .wrap {
 
 /* ---------- Glowing progress bar, now with the mini axolotl riding it ---------- */
 .gl-wrap { background: rgba(255, 247, 232, 0.95); box-shadow: 0 6px 12px rgba(30, 58, 52, 0.05); }
-.gl-inner { padding: 12px 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.gl-inner { padding: 12px 16px 18px; display: flex; flex-direction: column; gap: 18px; }
 .gl-meta { display: flex; justify-content: space-between; align-items: baseline; min-height: 20px; font-size: 13.5px; }
 .gl-step { font-weight: 700; color: #3A4A44; }
 .gl-cheer { font-weight: 800; color: var(--coral-deep); animation: cheer 420ms var(--ease-out) 640ms both; }
@@ -187,7 +187,7 @@ header.site .wrap {
 @keyframes glPulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.85; } }
 
 /* ---------- Screens ---------- */
-main.screen { padding: 28px 0 110px; }
+main.screen { padding-top: 28px; padding-bottom: 110px; }  /* side padding comes from .wrap */
 .enter-fwd, .enter-back { /* GSAP drives entrances; these stay as no-JS fallback */ }
 .no-gsap .enter-fwd { animation: enterFwd 340ms var(--ease-out) both; }
 .no-gsap .enter-back { animation: enterBack 340ms var(--ease-out) both; }
@@ -325,7 +325,7 @@ main.screen { padding: 28px 0 110px; }
 .math { border-top: 1px solid var(--line-soft); padding-top: 10px; font-size: 14px; }
 .math table { width: 100%; border-collapse: collapse; }
 .math td { padding: 3px 0; }
-.math td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.math td:last-child { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; padding-left: 12px; vertical-align: top; }
 details.why { border-top: 1px solid var(--line-soft); padding-top: 14px; }
 details.why summary { cursor: pointer; font-weight: 800; color: var(--palm); }
 .callout { background: #FFF3DA; border: 1.5px solid #EED9AE; border-radius: 16px; padding: 14px 16px; }
@@ -393,3 +393,4 @@ details.why summary { cursor: pointer; font-weight: 800; color: var(--palm); }
 .hm-list { margin: 6px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
 @media (max-width: 420px) { .hm-labels { font-size: 11.5px; } .hm-labels small { font-size: 10.5px; } }
 .hm-amt.zero { color: var(--muted); }
+.credit-line { flex-basis: 100%; margin: 0; padding-top: 10px; border-top: 1px solid var(--line-soft); font-size: 14.5px; color: #2E3A38; }

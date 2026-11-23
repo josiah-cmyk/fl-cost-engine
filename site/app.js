@@ -171,7 +171,8 @@ const flow = () => (state.mode === "detailed" ? DETAILED : QUICK);
 const stepIndex = () => flow().indexOf(state.screen);
 const BAR_STEPS = () => flow().length - 2;   // welcome and results sit outside the bar
 
-const CHEERS = ["Let's begin", "Nice start", "Halfway there", "Almost there", "Last step", "Last step"];
+// Encouragement keyed to how much is left, so it reads right in both the 5-step and 6-step flows.
+const cheer = (i, n) => i === n ? "Last step" : i === n - 1 ? "Almost there" : i === 1 ? "Let's begin" : i >= n / 2 ? "Halfway there" : "Nice start";
 
 function go(screen, dir = 1) {
   state.dir = dir;
@@ -204,7 +205,7 @@ function renderChrome() {
       <div class="gl-wrap"><div class="gl-inner wrap" role="progressbar" aria-valuemin="0"
            aria-valuemax="${n}" aria-valuenow="${i}" aria-valuetext="Step ${i} of ${n}">
         <div class="gl-meta"><span class="gl-step">Step ${i} of ${n} · ${names[state.screen]}</span>
-          <span class="gl-cheer">${CHEERS[Math.min(i, n) - 0]}</span></div>
+          <span class="gl-cheer">${cheer(i, n)}</span></div>
         <div class="gl-track">
           <div class="gl-clip" id="gl-clip"><span class="gl-glow"></span>
             <div class="gl-fill"><span class="gl-shim"></span></div></div>
@@ -446,7 +447,7 @@ screens.income = () => {
 screens.health = () => {
   const i = Math.min(state.careIdx, state.members.length - 1);
   const m = state.members[i];
-  const t = typicalFor(m);
+  const t = typicalFor({ ...m, profile: "typical" });
   const visits = (t.primary_care_visits + t.specialist_visits + t.preventive_visits + t.mental_health_visits).toFixed(0);
   const fills = (t.generic_rx_30day + t.brand_rx_30day + t.specialty_rx_30day).toFixed(0);
   const tHealthy = typicalFor({ ...m, profile: "healthy" });
@@ -454,7 +455,7 @@ screens.health = () => {
   const opts = [
     ["healthy", "Generally healthy", "Few visits, no ongoing conditions",
      `About ${Math.round(tHealthy.primary_care_visits + tHealthy.specialist_visits + tHealthy.preventive_visits + tHealthy.mental_health_visits)} visits a year`],
-    ["typical", "Typical for their age", "Not sure? This is a safe choice",
+    ["typical", `Typical for ${i === 0 ? "your" : "their"} age`, "Not sure? This is a safe choice",
      `About ${visits} visits and ${fills} prescription fills`],
     ["ongoing", "Ongoing condition", "Diabetes, blood pressure, asthma, depression or similar",
      `About ${Math.round(tOngoing.primary_care_visits + tOngoing.specialist_visits + tOngoing.preventive_visits + tOngoing.mental_health_visits)} visits and ${Math.round(tOngoing.generic_rx_30day + tOngoing.brand_rx_30day + tOngoing.specialty_rx_30day)} prescription fills`],
@@ -537,7 +538,7 @@ screens.care = () => {
     <section class="card stack" style="gap:12px">
       <h2 style="margin:0;font-size:18px">Prescriptions</h2>
       <div style="position:relative">
-        <input id="drug-q" class="input" style="width:100%" type="search" placeholder="Start typing a drug name, like lisinopril or Ozempic" autocomplete="off">
+        <input id="drug-q" class="input" style="width:100%" type="search" placeholder="Type a drug name, like lisinopril" autocomplete="off">
         <div id="drug-hits" class="card" style="position:absolute;left:0;right:0;top:100%;z-index:5;padding:0;max-height:260px;overflow:auto;display:none"></div></div>
       <ul class="drug-list stack" style="list-style:none;margin:0;padding:0;gap:8px">
         ${m.drugs.map((d, k) => `<li><span><b>${d.name}</b> <span style="font-size:13px;color:var(--muted)">· about $${Math.round(d.fill).toLocaleString()} a fill · monthly</span></span>
@@ -700,8 +701,9 @@ screens.results = () => {
     ${pondScene(res.plans.length)}
     <div class="card" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px">
       <span><b>${res.county} · ${state.members.length} ${state.members.length > 1 ? "people" : "person"}</b>
-        <span style="font-size:13px;color:var(--muted);display:block">$${Number(state.income).toLocaleString()} income · tax credit $${Math.round(res.aptc_month).toLocaleString()}/mo${res.variant !== "base" ? " · extra silver savings applied" : ""}</span></span>
-      <button class="btn ghost" id="edit-answers" style="min-height:44px;padding:8px 14px;font-size:14px">Edit answers</button></div>
+        <span style="font-size:13px;color:var(--muted);display:block">$${Number(state.income).toLocaleString()} household income for 2027</span></span>
+      <button class="btn ghost" id="edit-answers" style="min-height:44px;padding:8px 14px;font-size:14px">Edit answers</button>
+      <p class="credit-line">${creditLine(res)}</p></div>
 
     <div class="seg" role="group" aria-label="Scenario" style="max-width:440px">
       ${[["typical", "Typical year"], ["bad", "Bad year"], ["worst", "Worst case"]].map(([v, name]) =>
@@ -733,31 +735,45 @@ screens.results = () => {
   nav("");
 }
 
+/* One plain sentence about the tax credit, shown above the plans. */
+function creditLine(res) {
+  const n = state.members.length;
+  const silver = res.variant !== "base" ? " Silver plans also show your lower deductibles and copays." : "";
+  if (res.aptc_month > 0)
+    return `Your tax credit of ${usd(res.aptc_month)} a month is already taken off every price below. The government pays it straight to the insurer, so you only pay what's left.${silver}`;
+  const line = Number(state.income) * 100 / res.fpl_pct;
+  if (res.fpl_pct >= 100 && res.fpl_pct <= 400)
+    return `At your income, a standard silver plan here already costs less than your expected share, so there's no tax credit to take off. These are full prices.${silver}`;
+  return res.fpl_pct < 100
+    ? `There's no tax credit for ${n === 1 ? "a household of one" : `a household of ${n}`} earning under ${usd(line)} in Florida, so these are full prices. Go back to the income step for other places to get care.`
+    : `There's no tax credit for ${n === 1 ? "a household of one" : `a household of ${n}`} earning over ${usd(line * 4)}, so these are full prices.`;
+}
+
 function planCard(p, i, low, key, maxShown) {
   const diff = p[key] - low;
   const typPct = Math.min(100, p[key] / maxShown * 100);
   const worstPct = Math.min(100, p.worst_total / maxShown * 100);
   return `
   <article class="plan-card ${i === 0 ? "winner" : ""}">
-    ${i === 0 ? `<span class="badge">Lowest cost</span>` : `<span class="badge soft">+$${Math.round(diff).toLocaleString()}</span>`}
+    ${i === 0 ? `<span class="badge">Lowest cost</span>` : `<span class="badge soft">${diff < 1 ? "Same cost" : `+$${Math.round(diff).toLocaleString()}`}</span>`}
     <div class="plan-top">
       <div><h3 class="plan-name">${p.issuer}</h3>
         <div class="plan-meta">${p.plan}</div>
         <div class="plan-meta">${p.metal} · ${p.type} · $${Math.round(p.ded_person ?? 0).toLocaleString()} deductible · $${Math.round(p.moop_person ?? 0).toLocaleString()} out-of-pocket limit</div></div>
       <div class="plan-price"><b>$${p[key].toLocaleString()}</b><span>for 2027</span></div></div>
     <div class="cost-bar" aria-hidden="true"><span class="worst" style="width:${worstPct}%"></span><span class="typ" style="width:${typPct}%"></span></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;color:#2E3A38">
-      <span>$${p.net_premium_month.toLocaleString(undefined, { maximumFractionDigits: 0 })}/mo after credit</span>
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;font-size:13px;color:#2E3A38">
+      <span>${p.net_premium_month < 0.5 ? "$0 premium for you" : `You pay $${p.net_premium_month.toLocaleString(undefined, { maximumFractionDigits: 0 })} a month`}</span>
       <span>Worst case $${p.worst_total.toLocaleString()}</span></div>
     <p style="margin:0;font-size:14px">${explain(p)}</p>
     <div><button class="btn ghost" data-math="${i}" aria-expanded="false" style="min-height:44px;padding:8px 14px;font-size:14px">Show the math</button></div>
     <div class="math" id="math-${i}" style="display:none"><table>
-      <tr><td>Premiums for the year</td><td>$${Math.round(p.premium_month * 12).toLocaleString()}</td></tr>
-      <tr><td>Tax credit</td><td>−$${Math.round((p.premium_month - p.net_premium_month) * 12).toLocaleString()}</td></tr>
-      <tr><td>Your share of care (${{ typical_total: "typical year", bad_year_total: "bad year", worst_total: "at the plan's limit" }[key]})</td>
+      <tr><td>Full price of the plan for the year</td><td>$${Math.round(p.premium_month * 12).toLocaleString()}</td></tr>
+      <tr><td>Minus your tax credit, paid to the insurer for you</td><td>−$${Math.round((p.premium_month - p.net_premium_month) * 12).toLocaleString()}</td></tr>
+      <tr><td>Plus what you'd pay for care (${{ typical_total: "typical year", bad_year_total: "bad year", worst_total: "up to the plan's limit" }[key]})</td>
         <td>$${(p[key] - Math.round(p.net_premium_month * 12)).toLocaleString()}</td></tr>
-      <tr><td><b>Total</b></td><td><b>$${p[key].toLocaleString()}</b></td></tr></table>
-      <p class="disclaimer" style="margin:8px 0 0">Simulated across 300 versions of your household's year. Half of simulated years cost this much or less in the typical view; the bad year is the 90th percentile.</p></div>
+      <tr><td><b>What you'd pay in 2027</b></td><td><b>$${p[key].toLocaleString()}</b></td></tr></table>
+      <p class="disclaimer" style="margin:8px 0 0">${{ typical_total: "We played out your household's year 300 times. In half of them, care cost this much or less.", bad_year_total: "We played out your household's year 300 times. Only 1 in 10 cost more than this.", worst_total: "This is the most the plan lets you pay for covered care in a year, plus premiums." }[key]}</p></div>
   </article>`;
 }
 
