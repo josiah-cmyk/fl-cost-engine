@@ -394,3 +394,50 @@ details.why summary { cursor: pointer; font-weight: 800; color: var(--palm); }
 @media (max-width: 420px) { .hm-labels { font-size: 11.5px; } .hm-labels small { font-size: 10.5px; } }
 .hm-amt.zero { color: var(--muted); }
 .credit-line { flex-basis: 100%; margin: 0; padding-top: 10px; border-top: 1px solid var(--line-soft); font-size: 14.5px; color: #2E3A38; }
+
+/* ---------- Home page sections ---------- */
+.home-sec { display: flex; flex-direction: column; gap: 10px; padding-top: 28px; border-top: 1px solid var(--line); margin-top: 8px; }
+.home-sec h2, .home-cta h2 { margin: 0; font-size: clamp(24px, 3.6vw, 30px); line-height: 1.15; }
+.home-sec > p { margin: 0; font-size: 17px; color: #2E3A38; max-width: 64ch; }
+.ex-card { margin: 8px 0 0; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.ex-card figcaption { font-size: 14px; color: var(--muted); }
+.ex-row { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "label total" "bar bar"; gap: 6px 12px; align-items: end; }
+.ex-label { grid-area: label; display: flex; flex-direction: column; }
+.ex-label span { font-size: 13.5px; color: var(--muted); }
+.ex-total { grid-area: total; font-family: "Baloo 2", sans-serif; font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; }
+.ex-bar { grid-area: bar; display: flex; gap: 3px; height: 16px; }
+.ex-bar span { border-radius: 5px; }
+.ex-prem { background: var(--palm); }
+.ex-care { background: var(--coral); }
+.ex-key { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); }
+.ex-key span { display: inline-flex; align-items: center; gap: 6px; }
+.ex-key i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.ex-note { margin: 0; font-weight: 700; font-size: 15px; }
+ol.how { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px; counter-reset: how; }
+ol.how li { counter-increment: how; display: grid; grid-template-columns: 40px 1fr; column-gap: 12px; }
+ol.how li::before {
+  content: counter(how); grid-row: span 2; width: 36px; height: 36px; border-radius: 999px;
+  background: var(--lagoon-soft); color: var(--lagoon-deep); border: 2px solid var(--lagoon);
+  display: flex; align-items: center; justify-content: center; font-family: "Baloo 2", sans-serif; font-weight: 800; font-size: 18px;
+}
+ol.how b { font-size: 17px; }
+ol.how span { color: #2E3A38; font-size: 15.5px; }
+.does-grid { display: grid; gap: 16px; margin-top: 4px; }
+.does-col { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
+.does-col h3 { margin: 0 0 10px; font-size: 19px; }
+ul.hl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 15.5px; color: #2E3A38; }
+ul.hl li { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: start; }
+.hl-ico { width: 22px; height: 22px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; margin-top: 1px; }
+.hl-ico.ok { background: var(--mint); color: var(--palm); }
+.hl-ico.no { background: #FFE3DC; color: var(--coral-deep); }
+dl.src { margin: 4px 0 0; display: flex; flex-direction: column; gap: 0; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 4px 16px; }
+dl.src div { padding: 12px 0; border-bottom: 1px solid var(--line-soft); }
+dl.src div:last-child { border-bottom: 0; }
+dl.src dt { font-weight: 800; }
+dl.src dd { margin: 2px 0 0; color: #2E3A38; font-size: 15px; }
+.callout.enroll { display: flex; gap: 10px; align-items: flex-start; font-size: 15.5px; margin-top: 8px; }
+.callout.enroll svg { flex: none; margin-top: 3px; }
+.home-cta { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 24px 0 8px; }
+.home-cta p { margin: 0 0 8px; color: var(--muted); font-size: 17px; }
+@media (min-width: 701px) { .does-grid { grid-template-columns: 1fr 1fr; } }
+.home-cta p, .home-cta h2 { text-wrap: balance; }

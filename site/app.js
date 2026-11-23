@@ -240,6 +240,97 @@ async function advance() {
 /* ---------------- screens ---------------- */
 const screens = {};
 
+/* ---------------- home page sections (below the welcome hero) ---------------- */
+const tick = `<span class="hl-ico ok" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+const nope = `<span class="hl-ico no" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></span>`;
+
+function homeSections() {
+  // Example with made-up numbers: a low-premium plan vs a higher-premium plan with a lower deductible.
+  const ex = [
+    { name: "Plan A", note: "Lowest premium, $9,000 deductible", prem: 2160, care: 4800 },
+    { name: "Plan B", note: "Higher premium, $2,500 deductible", prem: 3120, care: 1400 },
+  ];
+  const max = Math.max(...ex.map((e) => e.prem + e.care));
+  const bars = ex.map((e) => `
+    <div class="ex-row">
+      <div class="ex-label"><b>${e.name}</b><span>${e.note}</span></div>
+      <div class="ex-bar" role="img" aria-label="${e.name}: ${usd(e.prem)} in premiums plus ${usd(e.care)} for care, ${usd(e.prem + e.care)} total">
+        <span class="ex-prem" style="width:${(e.prem / max) * 100}%"></span><span class="ex-care" style="width:${(e.care / max) * 100}%"></span></div>
+      <div class="ex-total">${usd(e.prem + e.care)}</div>
+    </div>`).join("");
+
+  const does = [
+    "Ranks every 2027 marketplace plan sold in your Florida county by what you'd pay for the whole year",
+    "Takes off your estimated tax credit, and the lower deductibles silver plans come with if your income qualifies",
+    "Estimates your care from how people your age, sex and health really use care",
+    "Prices your prescriptions by name in the detailed estimate",
+    "Shows a typical year, a bad year and a worst case, with the math for every plan",
+    "Runs entirely on your phone or computer. Nothing you type is saved or sent anywhere.",
+  ];
+  const doesnt = [
+    "Sign you up. You enroll at HealthCare.gov, with a licensed agent, or with a free local navigator.",
+    "Check if your doctors, hospitals or medications are covered by a plan. Call them before you enroll.",
+    "Set your official tax credit. HealthCare.gov decides the final amount when you apply.",
+    "Predict your real year. These are estimates, and a new diagnosis can change everything.",
+    "Cover job-based plans, Medicare, Medicaid, short-term plans or stand-alone dental.",
+    "Take money from insurers. No ads, no referral fees, and no one can pay for a better spot.",
+  ];
+  const sources = [
+    ["Plans, premiums and copays", "The federal 2027 marketplace plan files from CMS"],
+    ["Tax credit", "IRS rules for 2027 and the federal poverty guidelines"],
+    ["How much care people use", "AHRQ's Medical Expenditure Panel Survey, 2022 to 2024, about 24,000 privately insured people"],
+    ["What care costs", "Medicare's 2027 payment rates, raised to what marketplace plans pay in Florida"],
+    ["Prescription prices", "CMS's weekly survey of what pharmacies pay for drugs (NADAC)"],
+  ];
+
+  return `
+  <section class="home-sec" aria-labelledby="h-why">
+    <h2 id="h-why">Why ClearYear exists</h2>
+    <p>Most people shopping for health insurance sort by the monthly premium and pick the lowest one. That plan often comes with a deductible of $7,000 or more. One trip to the ER or a few specialist visits, and the cheap plan can cost more for the year than one with a higher premium.</p>
+    <p>Deductibles, copays and coinsurance are hard to add up in your head. ClearYear does that math for every plan in your county, using your household.</p>
+    <figure class="ex-card">
+      <figcaption>An example with made-up numbers: same person, a few specialist visits and one ER trip.</figcaption>
+      ${bars}
+      <div class="ex-key"><span><i class="ex-prem"></i>Premiums for the year</span><span><i class="ex-care"></i>What they pay for care</span></div>
+      <p class="ex-note">Plan B costs ${usd(ex[0].prem + ex[0].care - ex[1].prem - ex[1].care)} less for the year, even though its premium is higher.</p>
+    </figure>
+  </section>
+
+  <section class="home-sec" aria-labelledby="h-how">
+    <h2 id="h-how">How it works</h2>
+    <ol class="how">
+      <li><b>Answer a few questions</b><span>Your ZIP code, who needs coverage, your expected income and how much care you usually use. It takes about two minutes.</span></li>
+      <li><b>Lolo prices every plan</b><span>We play out your year 300 times on each plan, using real 2027 premiums, deductibles and copays, then take off your tax credit.</span></li>
+      <li><b>See what you'd really pay</b><span>Plans are ranked by total cost for the year, with the math shown so you can check it.</span></li>
+    </ol>
+  </section>
+
+  <section class="home-sec" aria-labelledby="h-does">
+    <h2 id="h-does">What ClearYear does, and what it doesn't</h2>
+    <div class="does-grid">
+      <div class="does-col"><h3>It does</h3><ul class="hl">${does.map((t) => `<li>${tick}<span>${t}</span></li>`).join("")}</ul></div>
+      <div class="does-col"><h3>It doesn't</h3><ul class="hl">${doesnt.map((t) => `<li>${nope}<span>${t}</span></li>`).join("")}</ul></div>
+    </div>
+  </section>
+
+  <section class="home-sec" aria-labelledby="h-src">
+    <h2 id="h-src">Where the numbers come from</h2>
+    <dl class="src">${sources.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>
+  </section>
+
+  <aside class="callout enroll">${icoSun}<span><b>Open enrollment for 2027 runs November 1, 2026 to January 15, 2027.</b> Sign up by December 15 for coverage that starts January 1.</span></aside>
+
+  <section class="home-cta">
+    <div class="home-cta-ax">${axolotl("ax-happy ax-wave", 120)}</div>
+    <h2>Ready when you are</h2>
+    <p>Lolo will walk you through it, one question at a time.</p>
+    <div class="stack" style="gap:12px;max-width:480px;width:100%;margin:0 auto">
+      <button class="btn big" id="start-quick-2">Start quick estimate ${arrow}</button>
+      <button class="btn ghost" id="start-detailed-2">Detailed estimate · adds conditions, visits and your prescriptions</button>
+    </div>
+  </section>`;
+}
+
 screens.welcome = () => {
   app.innerHTML = `
   <div class="narrow stack ${enter()}">
@@ -259,10 +350,13 @@ screens.welcome = () => {
       <button class="btn big" id="start-quick">Start quick estimate ${arrow}</button>
       <button class="btn ghost" id="start-detailed">Detailed estimate · adds conditions, visits and your prescriptions</button>
     </div>
+    ${homeSections()}
     <p class="disclaimer">Estimates only, not a quote or advice. Plan data comes from the federal 2027 marketplace files. Enroll and get your official tax credit at <a href="https://www.healthcare.gov" rel="noopener">HealthCare.gov</a>. Not affiliated with HealthCare.gov or any insurer.</p>
   </div>`;
   $("#start-quick").onclick = () => { state.mode = "quick"; go("zip"); };
   $("#start-detailed").onclick = () => { state.mode = "detailed"; go("zip"); };
+  $("#start-quick-2").onclick = () => { state.mode = "quick"; go("zip"); };
+  $("#start-detailed-2").onclick = () => { state.mode = "detailed"; go("zip"); };
   nav("");
   if (G && !RM) {
     G.from("#ax-hero", { y: 60, opacity: 0, scale: 0.85, duration: 0.8, ease: "back.out(1.5)", clearProps: "transform,opacity" });
