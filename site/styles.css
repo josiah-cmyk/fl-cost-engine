@@ -66,6 +66,36 @@ header.site .wrap {
 .ax .ax-arm-l { transform-box: fill-box; transform-origin: 80% 15%; }
 .ax .ax-head { transform-box: fill-box; transform-origin: 50% 90%; }
 .ax-wave .ax-arm-l { animation: axWave 2.6s ease-in-out infinite; }
+.ax .ax-arm-r { transform-box: fill-box; transform-origin: 20% 15%; }
+/* Expressions swap by opacity so they work even with motion turned off */
+.ax .ax-eyes, .ax .ax-mouth { transition: opacity 160ms ease; }
+.ax .ax-squint, .ax .ax-mouth-o, .ax .ax-puffs { opacity: 0; transition: opacity 160ms ease; }
+.ax-joy .ax-eyes { opacity: 0; }
+.ax-joy .ax-squint { opacity: 1; }
+.ax-puff .ax-mouth { opacity: 0; }
+.ax-puff .ax-mouth-o, .ax-puff .ax-puffs { opacity: 1; }
+.ax-puff .ax-cheeks ellipse { fill: rgba(255, 110, 150, 0.7); }
+.ax-puff .ax-puffs circle { transform-box: fill-box; transform-origin: center; animation: axPuff 1.4s ease-in-out infinite; }
+@keyframes axPuff { 0%, 100% { transform: scale(0.82); } 50% { transform: scale(1.04); } }
+/* Tilting makes his big glasses slide down his snout, then he nudges them back */
+.ax .ax-glasses { transform-box: fill-box; transform-origin: 50% 50%; }
+.ax-tilt .ax-glasses { animation: axSlip 6s ease-in-out infinite; }
+@keyframes axSlip {
+  0%, 16% { transform: translate(0, 0) rotate(0); }
+  26%, 36% { transform: translate(-1px, 7px) rotate(-4deg); }
+  40% { transform: translate(0, -2px) rotate(1deg); }
+  44%, 62% { transform: translate(0, 0) rotate(0); }
+  72%, 82% { transform: translate(1px, 6px) rotate(3deg); }
+  86% { transform: translate(0, -2px) rotate(0); }
+  90%, 100% { transform: translate(0, 0) rotate(0); }
+}
+.ax .ax-flower-spin { transform-box: fill-box; transform-origin: center; animation: axFlower 5s ease-in-out infinite; }
+@keyframes axFlower { 0%, 100% { transform: rotate(-10deg) scale(1); } 50% { transform: rotate(10deg) scale(1.06); } }
+/* Ta-da: both arms up, wiggling */
+.ax-tada .ax-arm-l { transform: rotate(96deg); animation: tadaL 0.8s ease-in-out infinite alternate; }
+.ax-tada .ax-arm-r { transform: rotate(-96deg); animation: tadaR 0.8s ease-in-out infinite alternate; }
+@keyframes tadaL { from { transform: rotate(82deg); } to { transform: rotate(108deg); } }
+@keyframes tadaR { from { transform: rotate(-82deg); } to { transform: rotate(-108deg); } }
 .ax-tilt .ax-head { animation: axTilt 6s ease-in-out infinite; }
 .ax-happy .ax-all { animation: axHappy 2.4s ease-in-out infinite; }
 @keyframes axBob { 0%, 100% { transform: translateY(0) rotate(-1.2deg); } 50% { transform: translateY(-7px) rotate(1.2deg); } }
@@ -324,7 +354,8 @@ details.why summary { cursor: pointer; font-weight: 800; color: var(--palm); }
   .breathe, .float, .ico-bob { animation: none; }
   .cost-bar .typ { animation: none; }
   .ico-twinkle { animation: none; }
-  .ax .ax-all, .ax .ax-gill, .ax .ax-tail, .ax .ax-arm-l, .ax .ax-head,
+  .ax .ax-all, .ax .ax-gill, .ax .ax-tail, .ax .ax-arm-l, .ax .ax-arm-r, .ax .ax-head,
+  .ax .ax-glasses, .ax .ax-flower-spin, .ax-puff .ax-puffs circle,
   .gl-rider .ax-all, .bubbles span,
   .pond .lily, .pond .reed, .pond .wave-line { animation: none; }
   @keyframes fade { from { opacity: 0; } }

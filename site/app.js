@@ -1,3 +1,4 @@
+import { axBody } from "./axel.js";
 /* ClearYear - the site. Loads the packed data, runs the engine in the
    browser, and walks the user through the guided flow. Nothing typed here leaves
    the page: there is no backend and no analytics on answers. */
@@ -11,69 +12,6 @@ const G = typeof gsap !== "undefined" ? gsap : null;
 const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
 if (!G) document.documentElement.classList.add("no-gsap");
 
-let axN = 0;
-/* Inner markup of the axolotl, so he can live in plain HTML or inside a scene SVG. */
-// Axel: chibi proportions (big wide head, small round body), low-set glossy eyes,
-// oversized round glasses sitting a little crooked, cat-mouth smile, blush, paddle gills.
-function axBody() {
-  const id = "axg" + (++axN);
-  const line = 'stroke="rgba(52,128,168,0.75)" stroke-width="2.6" stroke-linejoin="round"';
-  const skin = `fill="url(#${id}b)" ${line}`;
-  // A gill is a short rounded paddle, fat at the tip, with soft fringe lines. The rotation lives
-  // on an inner group so the CSS sway on .ax-gill still works.
-  const gill = (cls, bx, by, deg, k = 1) => `<g class="ax-gill ${cls}"><g transform="translate(${bx} ${by}) rotate(${deg}) scale(${k})">
-      <path d="M0 -4 C9 -6 15 -12 23 -12 C33 -12 36 -4 36 0 C36 4 33 12 23 12 C15 12 9 6 0 4 Z" fill="url(#${id}g)" stroke="rgba(52,128,168,0.7)" stroke-width="2.4" stroke-linejoin="round"/>
-      <path d="M14 -2 L30 -7 M16 0 L33 0 M14 2 L30 7" stroke="rgba(255,255,255,0.65)" stroke-width="2" stroke-linecap="round"/>
-      <circle cx="27" cy="-6" r="2.2" fill="#fff" opacity="0.8"/></g></g>`;
-  return `
-  <defs>
-    <filter id="${id}" x="-40%" y="-40%" width="180%" height="180%">
-      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#86E3FF" flood-opacity="0.75"/>
-    </filter>
-    <radialGradient id="${id}b" cx="40%" cy="28%" r="80%">
-      <stop offset="0" stop-color="rgba(240,252,255,0.97)"/>
-      <stop offset="0.55" stop-color="rgba(178,236,255,0.93)"/>
-      <stop offset="1" stop-color="rgba(140,214,246,0.93)"/>
-    </radialGradient>
-    <linearGradient id="${id}g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#8FDDFB"/><stop offset="1" stop-color="#C3B4FF"/>
-    </linearGradient>
-  </defs>
-  <g class="ax-all" filter="url(#${id})">
-    <g class="ax-tail"><path d="M134 150 C160 158 184 146 196 118 C200 110 192 106 186 112 C176 126 160 132 140 134 Z" ${skin}/>
-      <path d="M150 140 C166 140 180 132 188 118" stroke="rgba(195,180,255,0.7)" stroke-width="4" stroke-linecap="round" fill="none"/></g>
-    <ellipse cx="108" cy="142" rx="35" ry="28" ${skin}/>
-    <ellipse cx="108" cy="148" rx="20" ry="15" fill="rgba(245,253,255,0.9)"/>
-    <ellipse cx="92" cy="168" rx="10" ry="6.5" ${skin}/><ellipse cx="124" cy="168" rx="10" ry="6.5" ${skin}/>
-    <g class="ax-arm-l"><ellipse cx="76" cy="150" rx="8" ry="12.5" transform="rotate(28 76 150)" ${skin}/></g>
-    <ellipse cx="140" cy="150" rx="8" ry="12.5" transform="rotate(-28 140 150)" ${skin}/>
-    <g class="ax-head">
-      ${gill("l1", 70, 52, -128, 0.95)}
-      ${gill("l2", 56, 74, -172, 1.05)}
-      ${gill("l3", 60, 98, 150, 0.95)}
-      ${gill("r1", 150, 52, -52, 0.95)}
-      ${gill("r2", 164, 74, -8, 1.05)}
-      ${gill("r3", 160, 98, 30, 0.95)}
-      <ellipse cx="110" cy="80" rx="62" ry="47" ${skin}/>
-      <circle cx="98" cy="44" r="2.4" fill="rgba(110,190,230,0.7)"/><circle cx="110" cy="40" r="2.8" fill="rgba(110,190,230,0.7)"/><circle cx="122" cy="44" r="2.4" fill="rgba(110,190,230,0.7)"/>
-      
-      <ellipse cx="84" cy="90" rx="11.5" ry="12.5" fill="#20384A"/><ellipse cx="136" cy="90" rx="11.5" ry="12.5" fill="#20384A"/>
-      <circle cx="80" cy="85" r="4.6" fill="#fff"/><circle cx="132" cy="85" r="4.6" fill="#fff"/>
-      <circle cx="88.5" cy="95" r="2" fill="#fff" opacity="0.9"/><circle cx="140.5" cy="95" r="2" fill="#fff" opacity="0.9"/>
-      <g class="ax-lids"><ellipse cx="84" cy="90" rx="13" ry="14" fill="#B8EBFF"/><ellipse cx="136" cy="90" rx="13" ry="14" fill="#B8EBFF"/></g>
-      <path d="M101 104 Q105.5 109.5 110 104 Q114.5 109.5 119 104" stroke="#20384A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      <g transform="rotate(-4 110 90)">
-        <circle cx="84" cy="90" r="21" fill="rgba(255,255,255,0.14)" stroke="#FF7E67" stroke-width="4.5"/>
-        <circle cx="137" cy="90" r="22.5" fill="rgba(255,255,255,0.14)" stroke="#FF7E67" stroke-width="4.5"/>
-        <path d="M104 86 Q110.5 80 116 86" stroke="#FF7E67" stroke-width="4.5" stroke-linecap="round" fill="none"/>
-        <path d="M64 86 L54 80" stroke="#FF7E67" stroke-width="4.5" stroke-linecap="round"/><path d="M158.5 86 L168 80" stroke="#FF7E67" stroke-width="4.5" stroke-linecap="round"/>
-        <path d="M93 76 Q98 80 99 86" stroke="rgba(255,255,255,0.85)" stroke-width="3" stroke-linecap="round" fill="none"/>
-        <path d="M147 75 Q152 79 153 86" stroke="rgba(255,255,255,0.85)" stroke-width="3" stroke-linecap="round" fill="none"/>
-      </g>
-      <ellipse cx="62" cy="113" rx="9.5" ry="5.5" fill="rgba(255,138,170,0.55)"/><ellipse cx="158" cy="113" rx="9.5" ry="5.5" fill="rgba(255,138,170,0.55)"/>
-    </g>
-  </g>`;
-}
 const axolotl = (cls = "", w = 120) =>
   `<svg class="ax ${cls}" width="${w}" viewBox="0 0 220 190" fill="none" aria-hidden="true">${axBody()}</svg>`;
 
@@ -159,6 +97,7 @@ function pondArrive() {
   if (!ax) return;
   const tl = G.timeline({ delay: 0.25 });
   tl.fromTo(ax, { y: 90 }, { y: 0, duration: 0.9, ease: "back.out(1.7)" })
+    .call(() => ax.querySelector(".ax").classList.add("ax-tada"), null, 0.55)
     .fromTo(ring, { scale: 0.3, autoAlpha: 1, transformOrigin: "50% 50%" }, { scale: 1.4, autoAlpha: 0, duration: 0.7, ease: "power2.out" }, "<0.15")
     .fromTo(".pond h2, .pond .pond-note", { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out", stagger: 0.08 }, "<0.2");
 }
@@ -497,7 +436,7 @@ screens.income = () => {
     const fpl = e.fplPct(hh);
     const aptc = e.aptcMonthly(hh, state.county[0]);
     $("#credit").innerHTML = helpCard(e, hh, v, fpl, aptc);
-    const g = $("#ax-here .ax"); if (g) g.classList.toggle("ax-happy", aptc > 0);
+    const g = $("#ax-here .ax"); if (g) { g.classList.toggle("ax-happy", aptc > 0); g.classList.toggle("ax-joy", aptc >= 150); }
   };
   inp.oninput = () => { inp.value = inp.value.replace(/[^0-9]/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ","); show(); };
   show();
@@ -673,7 +612,7 @@ async function runResults() {
   app.innerHTML = `<div class="narrow stack" style="align-items:center;padding:40px 0">
     <div id="swim-strip" style="position:relative;width:100%;height:110px;overflow:hidden">
       ${bubbles(5)}
-      <span id="swim-ax" style="position:absolute;left:0;top:10px;display:block">${axolotl("", 96)}</span>
+      <span id="swim-ax" style="position:absolute;left:0;top:10px;display:block">${axolotl("ax-puff", 96)}</span>
     </div>
     <div class="gl-track" style="width:min(420px,80%)"><div class="gl-clip" style="clip-path:inset(-14px 20% -14px -14px round 999px)">
       <span class="gl-glow"></span><div class="gl-fill"><span class="gl-shim"></span></div></div></div>
@@ -684,6 +623,7 @@ async function runResults() {
     G.fromTo(fish, { x: -120 }, { x: strip.offsetWidth + 120, duration: 2.8, ease: "none", repeat: -1 });
     G.to(fish, { y: 14, duration: 0.9, ease: "sine.inOut", yoyo: true, repeat: -1 });
   }
+  const started = performance.now();
   await new Promise((r) => setTimeout(r, 30));
   const e = await engineFor(state.county[1]);
   const members = state.members.map((m) => {
@@ -703,6 +643,8 @@ async function runResults() {
   const hh = { zip: state.zip, income: Number(state.income), members };
   state.results = e.rank(hh, 300, 7);
   state.pondShown = false;
+  // Pricing takes well under a second. Hold the thinking moment long enough to see Axel at work.
+  if (G && !RM) await new Promise((r) => setTimeout(r, Math.max(0, 1400 - (performance.now() - started))));
   state.scenario = "typical";
   state.shownTiers = 1;
   go("results");
@@ -734,7 +676,7 @@ function pondScene(planCount) {
       <g class="lily"><ellipse cx="140" cy="150" rx="30" ry="10" fill="#43A96C"/><path d="M140 150 L168 144 L166 154 Z" fill="#7ED7EA"/><circle cx="128" cy="140" r="6" fill="#FF9DB0"/><circle cx="128" cy="136" r="3.4" fill="#FFD1DB"/></g>
       <g class="lily b"><ellipse cx="470" cy="162" rx="36" ry="11" fill="#3B9A61"/><path d="M470 162 L500 156 L498 166 Z" fill="#5BC9E2"/></g>
       <ellipse class="pond-ring" cx="300" cy="150" rx="70" ry="12" stroke="#fff" stroke-width="3" fill="none" opacity="0"/>
-      <g class="pond-ax"><svg class="ax ax-happy" x="225" y="26" width="150" viewBox="0 0 220 190">${axBody()}</svg></g>
+      <g class="pond-ax"><svg class="ax ax-happy ax-joy${state.pondShown || RM || !G ? " ax-tada" : ""}" x="225" y="8" width="150" viewBox="0 0 220 190">${axBody()}</svg></g>
       <path d="M0 162 Q60 154 120 162 T240 160 T360 162 T480 159 T600 162 V200 H0 Z" fill="#5BC9E2"/>
       <path class="wave-line" d="M-80 176 Q-40 170 0 176 T80 176 T160 176 T240 176 T320 176 T400 176 T480 176 T560 176 T640 176 T720 176" stroke="rgba(255,255,255,0.55)" stroke-width="3" stroke-linecap="round"/>
     </svg>
