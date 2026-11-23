@@ -37,10 +37,10 @@ export function axBody() {
   </defs>
   <g class="ax-all" filter="url(#${id})">
     <g class="ax-tail">
-      <path d="M126 146 C146 154 166 154 180 146 C188 141 194 134 201 134 C209 135 211 145 205 152 C193 166 166 172 130 168 Z" fill="rgba(200,185,255,0.75)" stroke="rgba(200,185,255,0.75)" stroke-width="12" stroke-linejoin="round"/>
-      <path d="M126 146 C146 154 166 154 180 146 C188 141 194 134 201 134 C209 135 211 145 205 152 C193 166 166 172 130 168 Z" fill="none" stroke="rgba(120,110,210,0.4)" stroke-width="13.5" stroke-linejoin="round" opacity="0.6" style="mix-blend-mode:multiply"/>
-      <path d="M126 146 C146 154 166 154 180 146 C188 141 194 134 201 134 C209 135 211 145 205 152 C193 166 166 172 130 168 Z" ${skin}/>
-      <path d="M150 160 C170 160 186 154 198 144" stroke="rgba(255,255,255,0.7)" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+      <path d="M122 136 C150 146 180 144 203 124 Q211 119 209 128 C198 152 166 176 122 174 Z" fill="rgba(200,185,255,0.75)" stroke="rgba(200,185,255,0.75)" stroke-width="10" stroke-linejoin="round"/>
+      <path d="M122 136 C150 146 180 144 203 124 Q211 119 209 128 C198 152 166 176 122 174 Z" fill="none" stroke="rgba(120,110,210,0.4)" stroke-width="11.5" stroke-linejoin="round" opacity="0.6" style="mix-blend-mode:multiply"/>
+      <path d="M122 136 C150 146 180 144 203 124 Q211 119 209 128 C198 152 166 176 122 174 Z" ${skin}/>
+      <path d="M146 158 C168 158 186 146 200 132" stroke="rgba(255,255,255,0.7)" stroke-width="2.6" stroke-linecap="round" fill="none"/>
     </g>
     <ellipse cx="108" cy="142" rx="35" ry="28" ${skin}/>
     <ellipse cx="108" cy="148" rx="20" ry="15" fill="rgba(245,253,255,0.9)"/>
