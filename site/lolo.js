@@ -37,10 +37,10 @@ export function axBody() {
   </defs>
   <g class="ax-all" filter="url(#${id})">
     <g class="ax-tail">
-      <path d="M122 136 C150 146 180 144 203 124 Q211 119 209 128 C198 152 166 176 122 174 Z" fill="rgba(200,185,255,0.75)" stroke="rgba(200,185,255,0.75)" stroke-width="10" stroke-linejoin="round"/>
-      <path d="M122 136 C150 146 180 144 203 124 Q211 119 209 128 C198 152 166 176 122 174 Z" fill="none" stroke="rgba(120,110,210,0.4)" stroke-width="11.5" stroke-linejoin="round" opacity="0.6" style="mix-blend-mode:multiply"/>
-      <path d="M122 136 C150 146 180 144 203 124 Q211 119 209 128 C198 152 166 176 122 174 Z" ${skin}/>
-      <path d="M146 158 C168 158 186 146 200 132" stroke="rgba(255,255,255,0.7)" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+      <path d="M138 140 C160 145 182 140 203 124 Q211 119 209 128 C204 142 192 150 176 155" fill="none" stroke="rgba(120,110,210,0.35)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M138 140 C160 145 182 140 203 124 Q211 119 209 128 C204 142 192 150 176 155" fill="none" stroke="rgba(200,185,255,0.95)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M122 134 C150 144 180 142 203 124 Q211 119 209 128 C198 149 168 164 126 162 Z" ${skin}/>
+      <path d="M146 154 C168 154 186 144 200 132" stroke="rgba(255,255,255,0.7)" stroke-width="2.6" stroke-linecap="round" fill="none"/>
     </g>
     <ellipse cx="108" cy="142" rx="35" ry="28" ${skin}/>
     <ellipse cx="108" cy="148" rx="20" ry="15" fill="rgba(245,253,255,0.9)"/>
